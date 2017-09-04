@@ -11,6 +11,10 @@ func (t *Text) Delete(x, y) *Text
 
 GapBuffer
 
+TODO:
+- Add automatic expansion when the gap becomes 0
+- [Low priority] Add automatic downsizing when the gap becomes large
+
 API
 
 ```go
