@@ -11,6 +11,9 @@ func TestString(t *testing.T) {
 	testCases := []string{
 		"Hello",
 		"Goodbye goodbye",
+		"",
+		"\n",
+		"012345678901234567890",
 	}
 	for _, tc := range testCases {
 		gb := New(tc)

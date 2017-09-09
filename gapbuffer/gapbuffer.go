@@ -4,7 +4,7 @@ package gapbuffer
 
 import "unicode/utf8"
 
-const defaultBufferSize = 20
+const defaultBufferSize = 200
 
 // GapBuffer implements a gap buffer
 type GapBuffer struct {

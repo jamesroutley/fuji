@@ -2,11 +2,23 @@
 
 A text editor
 
+Editor
+
+```go
+CursorUp()
+CursorDown()
+CursorLeft()
+CursorRight()
+Get() (rune)
+Set(r rune)
+```
+
 Text
 
 ```go
 func (t *Text) Insert(x, y, r) *Text
 func (t *Text) Delete(x, y) *Text
+func (t *Text) String()
 ```
 
 GapBuffer
