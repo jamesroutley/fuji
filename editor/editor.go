@@ -14,12 +14,14 @@ type NormalModeCommand func(*Editor)
 // InsertModeCommand defines the behaviour of an insert mode command
 type InsertModeCommand func(*Editor)
 
-// mode distinguishes between editor modes
-type mode uint8
+// Mode distinguishes between editor modes
+type Mode uint8
 
 const (
-	normalMode mode = iota
-	insertMode
+	// ModeNormal indicates the editor is in normal mode
+	ModeNormal Mode = iota
+	// ModeInsert indicates the editor is in insert mode
+	ModeInsert
 )
 
 // Editor exposes the main API of the text editor
@@ -29,7 +31,7 @@ type Editor struct {
 	curX, curY     int
 	normalCommands map[string]NormalModeCommand
 	insertCommands map[termbox.Key]InsertModeCommand
-	mode           mode
+	Mode           Mode
 }
 
 // New returns a new Editor
@@ -46,7 +48,7 @@ func New(filename string) *Editor {
 		0,
 		map[string]NormalModeCommand{},
 		map[termbox.Key]InsertModeCommand{},
-		normalMode}
+		ModeNormal}
 }
 
 // Start the editor
@@ -60,26 +62,16 @@ func (e *Editor) Start() {
 
 	for {
 		ev := termbox.PollEvent()
-		switch e.mode {
-		case normalMode:
+		switch e.Mode {
+		case ModeNormal:
 			e.handleNormalModeEvent(ev)
-		case insertMode:
+		case ModeInsert:
 			e.handleInsertModeEvent(ev)
 		default:
 			panic("Should not reach here")
 		}
 		e.Draw()
 	}
-}
-
-// NormalMode puts the editor into normal mode
-func (e *Editor) NormalMode() {
-	e.mode = normalMode
-}
-
-// InsertMode puts the editor into insert mode
-func (e *Editor) InsertMode() {
-	e.mode = insertMode
 }
 
 func (e *Editor) handleNormalModeEvent(ev termbox.Event) {

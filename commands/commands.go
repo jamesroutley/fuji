@@ -16,13 +16,13 @@ func Quit(e *editor.Editor) {
 	os.Exit(0)
 }
 
-func Insert(e *editor.Editor) { e.InsertMode() }
+func Insert(e *editor.Editor) { e.Mode = editor.ModeInsert }
 func Append(e *editor.Editor) {
 	e.CursorRight()
-	e.InsertMode()
+	e.Mode = editor.ModeInsert
 }
 
-func NormalMode(e *editor.Editor) { e.NormalMode() }
+func NormalMode(e *editor.Editor) { e.Mode = editor.ModeNormal }
 
 func Space(e *editor.Editor) { e.Insert(' ') }
 
