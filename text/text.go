@@ -1,5 +1,4 @@
 // Package text implements a data structure which contains the text of a file.
-// TODO: choose y or i for line index
 package text
 
 import (
@@ -44,17 +43,8 @@ func New(r io.Reader) *Text {
 
 // Line returns the contents of line i
 func (t *Text) Line(i int) *line.Line {
-	// index := i
-	// if i >= t.start {
-	// 	gapSize := t.end - t.start
-	// 	index = i + gapSize
-	// }
 	return t.buf[t.realIndex(i)]
 }
-
-// func (t *Text) SetLine(i int, l *line.Line) {
-
-// }
 
 func (t *Text) realIndex(i int) (index int) {
 	index = i
@@ -71,7 +61,6 @@ func (t *Text) LineLength(i int) int {
 }
 
 // Length returns the number of lines stored by text
-// TODO: need to test this
 func (t *Text) Length() int {
 	gapSize := t.end - t.start
 	return t.size - gapSize
@@ -79,17 +68,6 @@ func (t *Text) Length() int {
 
 // String returns the contents of text as a string
 func (t *Text) String() string {
-	// lines := bytes.Buffer{}
-	// // lines := make([]string, t.Length())
-	// for i, line := range t.buf {
-	// 	if i >= t.start && i < t.end {
-	// 		continue
-	// 	}
-	// 	lines.WriteString(line.String())
-	// 	lines.WriteRune('\n')
-	// }
-	// // TODO: this adds a trailing newline
-	// return lines.String()
 	lines := make([]string, t.Length())
 	i := 0
 	for _, line := range t.buf[:t.start] {

@@ -8,6 +8,7 @@ import (
 )
 
 func TestString(t *testing.T) {
+	t.Parallel()
 	testCases := []string{
 		"Hello",
 		"Goodbye goodbye",
@@ -22,6 +23,7 @@ func TestString(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
+	t.Parallel()
 	testCases := []struct {
 		l        *Line
 		r        rune
@@ -41,6 +43,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
+	t.Parallel()
 	testCases := []struct {
 		l        *Line
 		loc      int
@@ -58,6 +61,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteWithMoreDeletesThanRunes(t *testing.T) {
+	t.Parallel()
 	l := New("cat")
 	l = l.Delete(0)
 	l = l.Delete(0)
@@ -67,6 +71,7 @@ func TestDeleteWithMoreDeletesThanRunes(t *testing.T) {
 }
 
 func TestDeleteAndInsertAndString(t *testing.T) {
+	t.Parallel()
 	l := New("Hello")
 	l = l.Delete(0)
 	l = l.Insert('B', 0)
@@ -74,6 +79,7 @@ func TestDeleteAndInsertAndString(t *testing.T) {
 }
 
 func TestDuplicate(t *testing.T) {
+	t.Parallel()
 	l := New("Hello")
 	newl := l.duplicate()
 	assert.Equal(t, l.buf, newl.buf)
@@ -83,6 +89,7 @@ func TestDuplicate(t *testing.T) {
 }
 
 func TestSplit(t *testing.T) {
+	t.Parallel()
 	l := New("hello")
 	a, b := l.Split(2)
 	assert.Equal(t, "he", a.String())
@@ -90,6 +97,7 @@ func TestSplit(t *testing.T) {
 }
 
 func TestMoveGap(t *testing.T) {
+	t.Parallel()
 	testCases := []struct {
 		l    *Line
 		loc  int
@@ -128,6 +136,7 @@ func TestMoveGap(t *testing.T) {
 }
 
 func TestMoveGapLeft(t *testing.T) {
+	t.Parallel()
 	testCases := []struct {
 		l        *Line
 		expected string
@@ -148,6 +157,7 @@ func TestMoveGapLeft(t *testing.T) {
 }
 
 func TestMoveGapRight(t *testing.T) {
+	t.Parallel()
 	testCases := []struct {
 		l        *Line
 		expected string

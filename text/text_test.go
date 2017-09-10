@@ -47,6 +47,14 @@ world`
 	assert.Equal(t, "lo\nworld", text.String())
 }
 
+func TestLength(t *testing.T) {
+	t.Parallel()
+	source := `hello
+world`
+	text := newTextFromString(source)
+	assert.Equal(t, 2, text.Length())
+}
+
 func TestString(t *testing.T) {
 	t.Parallel()
 	source := `hello
