@@ -30,3 +30,5 @@ func Backspace(e *editor.Editor) {
 	e.CursorLeft()
 	e.Delete()
 }
+
+func Save(e *editor.Editor) { e.Save() }

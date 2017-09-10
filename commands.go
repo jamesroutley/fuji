@@ -11,9 +11,10 @@ func registerNormalModeCommands(e *editor.Editor) {
 	e.AddNormalModeCommand("k", commands.MoveCursorUp)
 	e.AddNormalModeCommand("h", commands.MoveCursorLeft)
 	e.AddNormalModeCommand("l", commands.MoveCursorRight)
-	e.AddNormalModeCommand("q", commands.Quit)
+	e.AddNormalModeCommand("Q", commands.Quit)
 	e.AddNormalModeCommand("i", commands.Insert)
 	e.AddNormalModeCommand("a", commands.Append)
+	e.AddNormalModeCommand("W", commands.Save)
 }
 
 func registerInsertModeCommands(e *editor.Editor) {

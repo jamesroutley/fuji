@@ -1,7 +1,7 @@
 package editor
 
 import (
-	"io"
+	"os"
 
 	"github.com/jamesroutley/fuji/text"
 	termbox "github.com/nsf/termbox-go"
@@ -24,6 +24,7 @@ const (
 
 // Editor exposes the main API of the text editor
 type Editor struct {
+	Filename       string
 	text           *text.Text
 	curX, curY     int
 	normalCommands map[string]NormalModeCommand
@@ -32,9 +33,15 @@ type Editor struct {
 }
 
 // New returns a new Editor
-func New(r io.Reader) *Editor {
+func New(filename string) *Editor {
+	f, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
 	return &Editor{
-		text.New(r),
+		filename,
+		text.New(f),
 		0,
 		0,
 		map[string]NormalModeCommand{},
@@ -186,4 +193,18 @@ func (e *Editor) Insert(r rune) {
 // Delete deletes the rune under the cursor
 func (e *Editor) Delete() {
 	e.text = e.text.Delete(e.curX, e.curY)
+}
+
+// Save saves the file
+func (e *Editor) Save() {
+	f, err := os.Create(e.Filename)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	_, err = f.WriteString(e.text.String())
+	if err != nil {
+		panic(err)
+	}
+	f.Sync()
 }

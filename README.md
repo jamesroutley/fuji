@@ -38,8 +38,9 @@ func (gb *GapBuffer) String() int
 
 Todo:
 
-- fix broken delete
-- spacebar
 - Sensible cursor movement
-- save files
+- insert at position 0 is broken
+- read in file if it exists
 - think about how to compose commands - currying???
+- don't panic on empty file
+- Running 'a' at the end of a line should move cursor one over
