@@ -122,10 +122,7 @@ func (e *Editor) Draw() {
 		for x, r := range line.String() {
 			termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
 		}
-
 	}
-	// for y, line := range e.text.Lines {
-	// }
 	e.displayCursor()
 	if err := termbox.Flush(); err != nil {
 		panic(err)
@@ -189,6 +186,15 @@ func (e *Editor) Insert(r rune) {
 // Delete deletes the rune under the cursor
 func (e *Editor) Delete() {
 	e.text = e.text.Delete(e.curX, e.curY)
+}
+
+// LineBreak inserts a line break at the cursor position
+func (e *Editor) LineBreak() {
+	e.text = e.text.SplitLine(e.curX, e.curY)
+	e.CursorDown()
+	for e.curX > 0 {
+		e.CursorLeft()
+	}
 }
 
 // Save saves the file

@@ -97,6 +97,33 @@ func (t *Text) Delete(row, col int) *Text {
 	return new
 }
 
+// InsertLine inserts l at col
+func (t *Text) InsertLine(col int, l *line.Line) *Text {
+	new := t.moveGap(col)
+	new.buf[col] = l
+	new.start++
+	return new
+}
+
+// DeleteLine deletes the line at col
+func (t *Text) DeleteLine(col int) *Text {
+	if t.Length() == 0 {
+		return t
+	}
+	new := t.moveGap(col + 1)
+	new.start--
+	return new
+}
+
+// SplitLine splits a line at (col, row)
+func (t *Text) SplitLine(row, col int) *Text {
+	l := t.Line(col)
+	a, b := l.Split(row)
+	new := t.InsertLine(col+1, b)
+	new.buf[new.realIndex(col)] = a
+	return new
+}
+
 // duplicate makes a copy of a text object
 func (t *Text) duplicate() *Text {
 	buf := make([]*line.Line, len(t.buf))

@@ -35,3 +35,5 @@ func Backspace(e *editor.Editor) {
 }
 
 func Save(e *editor.Editor) { e.Save() }
+
+func LineBreak(e *editor.Editor) { e.LineBreak() }

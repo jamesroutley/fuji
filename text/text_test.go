@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jamesroutley/fuji/line"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,6 +46,38 @@ world`
 	text = text.Delete(0, 0)
 
 	assert.Equal(t, "lo\nworld", text.String())
+}
+
+func TestInsertLine(t *testing.T) {
+	t.Parallel()
+	source := `hello
+world`
+	text := newTextFromString(source)
+	l := line.New("this")
+	text = text.InsertLine(1, l)
+	expected := `hello
+this
+world`
+	assert.Equal(t, expected, text.String())
+
+}
+
+func TestDeleteLine(t *testing.T) {
+	t.Parallel()
+	source := `hello
+world`
+	text := newTextFromString(source)
+	text = text.DeleteLine(0)
+	assert.Equal(t, "world", text.String())
+}
+
+func TestSplitLine(t *testing.T) {
+	t.Parallel()
+	text := newTextFromString("hello")
+	text = text.SplitLine(0, 2)
+	expected := `he
+llo`
+	assert.Equal(t, expected, text.String())
 }
 
 func TestLength(t *testing.T) {
