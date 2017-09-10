@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/jamesroutley/fuji/editor"
+	termbox "github.com/nsf/termbox-go"
 )
 
 func MoveCursorUp(e *editor.Editor)    { e.CursorUp() }
@@ -12,7 +13,9 @@ func MoveCursorLeft(e *editor.Editor)  { e.CursorLeft() }
 func MoveCursorRight(e *editor.Editor) { e.CursorRight() }
 
 func Quit(e *editor.Editor) {
-
+	// Set cursor to 0, 0 to avoid clear screen on quit.
+	termbox.SetCursor(0, 0)
+	termbox.Flush()
 	os.Exit(0)
 }
 
