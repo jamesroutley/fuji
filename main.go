@@ -12,5 +12,7 @@ func main() {
 		panic(err)
 	}
 	e := editor.New(f)
+	registerNormalModeCommands(e)
+	registerInsertModeCommands(e)
 	e.Start()
 }

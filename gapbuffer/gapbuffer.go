@@ -39,6 +39,9 @@ func (gb *GapBuffer) Insert(r rune, y int) *GapBuffer {
 
 // Delete deletes the rune at location loc
 func (gb *GapBuffer) Delete(loc int) *GapBuffer {
+	if gb.Length() == 0 {
+		return gb
+	}
 	newGb := gb.moveGap(loc + 1)
 	newGb.start--
 	return newGb
@@ -47,6 +50,13 @@ func (gb *GapBuffer) Delete(loc int) *GapBuffer {
 // String returns the string that the gap buffer contains
 func (gb *GapBuffer) String() string {
 	return string(gb.buf[:gb.start]) + string(gb.buf[gb.end:])
+}
+
+// Length returns the length of the gap buffer text
+// TODO: rewrite this to count runes
+// TODO: does this support unicode?
+func (gb *GapBuffer) Length() int {
+	return len(gb.String())
 }
 
 // duplicate deep copies a GapBuffer

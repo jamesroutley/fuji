@@ -1,3 +1,5 @@
+// Package text implements a data structure which contains the text of a file.
+// TODO: choose y or i for line index
 package text
 
 import (
@@ -31,6 +33,16 @@ func (text *Text) Line(i int) string {
 	return text.Lines[i].String()
 }
 
+// LineLength returns the length of line y
+func (text *Text) LineLength(y int) int {
+	return text.Lines[y].Length()
+}
+
+// Length returns the number of lines stored by text
+func (text *Text) Length() int {
+	return len(text.Lines)
+}
+
 func (text *Text) String() string {
 	lineStrings := make([]string, len(text.Lines))
 	for i, line := range text.Lines {
@@ -44,14 +56,14 @@ func (text *Text) String() string {
 // the currently displayed view
 func (text *Text) Insert(x, y int, r rune) *Text {
 	newText := text.duplicate()
-	newText.Lines[x] = newText.Lines[x].Insert(r, y)
+	newText.Lines[y] = newText.Lines[y].Insert(r, x)
 	return newText
 }
 
 // Delete deletes the rune at position x, y
 func (text *Text) Delete(x, y int) *Text {
 	newText := text.duplicate()
-	newText.Lines[x] = newText.Lines[x].Delete(y)
+	newText.Lines[y] = newText.Lines[y].Delete(x)
 	return newText
 }
 

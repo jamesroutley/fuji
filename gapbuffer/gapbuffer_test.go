@@ -57,6 +57,15 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestDeleteWithMoreDeletesThanRunes(t *testing.T) {
+	gb := New("cat")
+	gb = gb.Delete(0)
+	gb = gb.Delete(0)
+	gb = gb.Delete(0)
+	gb = gb.Delete(0)
+	assert.Equal(t, "", gb.String())
+}
+
 func TestDeleteAndInsertAndString(t *testing.T) {
 	gb := New("Hello")
 	gb = gb.Delete(0)

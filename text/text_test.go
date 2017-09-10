@@ -41,8 +41,10 @@ func TestDelete(t *testing.T) {
 world`
 	text := newTextFromString(source)
 	text = text.Delete(0, 0)
+	text = text.Delete(0, 0)
+	text = text.Delete(0, 0)
 
-	assert.Equal(t, "ello\nworld", text.String())
+	assert.Equal(t, "lo\nworld", text.String())
 }
 
 func TestString(t *testing.T) {

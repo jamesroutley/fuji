@@ -35,3 +35,11 @@ func (gb *GapBuffer) Delete(y) *GapBuffer
 func (gb *GapBuffer) Length() int
 func (gb *GapBuffer) String() int
 ```
+
+Todo:
+
+- fix broken delete
+- spacebar
+- Sensible cursor movement
+- save files
+- think about how to compose commands - currying???
