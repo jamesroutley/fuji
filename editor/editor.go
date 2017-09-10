@@ -117,11 +117,15 @@ func (e *Editor) Draw() {
 			termbox.SetCell(x, y, ' ', termbox.ColorDefault, termbox.ColorDefault)
 		}
 	}
-	for y, line := range e.text.Lines {
+	for y := 0; y < e.text.Length(); y++ {
+		line := e.text.Line(y)
 		for x, r := range line.String() {
 			termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
 		}
+
 	}
+	// for y, line := range e.text.Lines {
+	// }
 	e.displayCursor()
 	if err := termbox.Flush(); err != nil {
 		panic(err)
