@@ -96,6 +96,13 @@ func TestSplit(t *testing.T) {
 	assert.Equal(t, "llo", b.String())
 }
 
+// func TestAppend(t *testing.T) {
+// 	t.Parallel()
+// 	l := New("hello ")
+// 	l = l.Append(New("world"))
+// 	assert.Equal(t, "hello world", l.String())
+// }
+
 func TestMoveGap(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {

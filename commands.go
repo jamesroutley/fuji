@@ -22,4 +22,5 @@ func registerInsertModeCommands(e *editor.Editor) {
 	e.AddInsertModeCommand(termbox.KeySpace, commands.Space)
 	e.AddInsertModeCommand(termbox.KeyBackspace, commands.Backspace)
 	e.AddInsertModeCommand(termbox.KeyBackspace2, commands.Backspace)
+	e.AddInsertModeCommand(termbox.KeyEnter, commands.LineBreak)
 }

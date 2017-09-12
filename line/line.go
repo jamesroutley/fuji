@@ -66,8 +66,16 @@ func (l *Line) Split(i int) (*Line, *Line) {
 	return New(string(new.buf[:new.start])), New(string(new.buf[new.end:]))
 }
 
+// Append appends l2 to l
+func (l *Line) Append(l2 *Line) *Line {
+	return New(l.String() + l2.String())
+}
+
 // duplicate deep copies a Line
 func (l *Line) duplicate() *Line {
+	if l == nil {
+		panic(nil)
+	}
 	newBuf := make([]rune, l.size)
 	copy(newBuf, l.buf)
 	return &Line{

@@ -30,6 +30,9 @@ func NormalMode(e *editor.Editor) { e.Mode = editor.ModeNormal }
 func Space(e *editor.Editor) { e.Insert(' ') }
 
 func Backspace(e *editor.Editor) {
+	// if e.CursorAtLineStart() {
+
+	// }
 	e.CursorLeft()
 	e.Delete()
 }

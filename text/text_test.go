@@ -16,6 +16,29 @@ world`
 	for i, line := range strings.Split(source, "\n") {
 		assert.Equal(t, line, text.buf[i].String())
 	}
+	sourceLen := len(strings.Split(source, "\n"))
+	for i := sourceLen; i < sourceLen+defaultGapSize; i++ {
+		assert.Nil(t, text.buf[i])
+	}
+	assert.Equal(t, 2, text.start)
+	assert.Equal(t, 2+defaultGapSize, text.end)
+}
+
+func TestRealIndex(t *testing.T) {
+	t.Parallel()
+	source := `hello
+world`
+	text := newTextFromString(source)
+	// Move gap to beginning of buffer
+	text = text.moveGap(0)
+	index := text.realIndex(1)
+	assert.Equal(t, len(text.buf)-1, index)
+}
+
+func TestRealIndexWithSingleLine(t *testing.T) {
+	t.Parallel()
+	text := newTextFromString("hello")
+	assert.Equal(t, 0, text.realIndex(0))
 }
 
 func TestLineString(t *testing.T) {
@@ -30,10 +53,10 @@ func TestInsert(t *testing.T) {
 	source := `hello
 world`
 	text := newTextFromString(source)
-	text = text.Insert(0, 0, 's')
+	text = text.Insert(1, 0, 's')
 
-	assert.Equal(t, "shello", text.buf[0].String())
-	assert.Equal(t, "world", text.buf[1].String())
+	assert.Equal(t, "hello", text.buf[0].String())
+	assert.Equal(t, "sworld", text.buf[1].String())
 }
 
 func TestDelete(t *testing.T) {

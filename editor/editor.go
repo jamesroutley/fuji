@@ -169,6 +169,11 @@ func (e *Editor) CursorLeft() {
 	e.curX--
 }
 
+// CursorAtLineStart returns whether the cursor is at the beginning of a line
+func (e *Editor) CursorAtLineStart() bool {
+	return e.curX == 0
+}
+
 // CursorRight moves the cursor right
 func (e *Editor) CursorRight() {
 	if e.curX >= e.text.LineLength(e.curY)-1 {
@@ -179,23 +184,25 @@ func (e *Editor) CursorRight() {
 
 // Insert inserts rune r at the cursor position
 func (e *Editor) Insert(r rune) {
-	e.text = e.text.Insert(e.curX, e.curY, r)
+	e.text = e.text.Insert(e.curY, e.curX, r)
 	e.CursorRight()
 }
 
 // Delete deletes the rune under the cursor
 func (e *Editor) Delete() {
-	e.text = e.text.Delete(e.curX, e.curY)
+	e.text = e.text.Delete(e.curY, e.curX)
 }
 
 // LineBreak inserts a line break at the cursor position
 func (e *Editor) LineBreak() {
-	e.text = e.text.SplitLine(e.curX, e.curY)
+	e.text = e.text.SplitLine(e.curY, e.curX)
 	e.CursorDown()
 	for e.curX > 0 {
 		e.CursorLeft()
 	}
 }
+
+// func (e *Editor) Back
 
 // Save saves the file
 func (e *Editor) Save() {
