@@ -30,7 +30,7 @@ func New(text string) *Line {
 }
 
 // Insert inserts rune r at position y
-func (l *Line) Insert(r rune, i int) *Line {
+func (l Line) Insert(r rune, i int) *Line {
 	new := l.moveGap(i)
 	new.buf[i] = r
 	new.start++
@@ -38,9 +38,9 @@ func (l *Line) Insert(r rune, i int) *Line {
 }
 
 // Delete deletes the rune at location i
-func (l *Line) Delete(i int) *Line {
+func (l Line) Delete(i int) *Line {
 	if l.Length() == 0 {
-		return l
+		return &l
 	}
 	new := l.moveGap(i + 1)
 	new.start--
@@ -49,33 +49,30 @@ func (l *Line) Delete(i int) *Line {
 
 // String returns the string that the gap buffer contains
 // TODO: bytes.buffer this?
-func (l *Line) String() string {
+func (l Line) String() string {
 	return string(l.buf[:l.start]) + string(l.buf[l.end:])
 }
 
 // Length returns the length of the gap buffer text
 // TODO: rewrite this to count runes
 // TODO: does this support unicode?
-func (l *Line) Length() int {
+func (l Line) Length() int {
 	return len(l.String())
 }
 
 // Split splits the line at position i
-func (l *Line) Split(i int) (*Line, *Line) {
+func (l Line) Split(i int) (*Line, *Line) {
 	new := l.moveGap(i)
 	return New(string(new.buf[:new.start])), New(string(new.buf[new.end:]))
 }
 
 // Append appends l2 to l
-func (l *Line) Append(l2 *Line) *Line {
+func (l Line) Append(l2 *Line) *Line {
 	return New(l.String() + l2.String())
 }
 
 // duplicate deep copies a Line
-func (l *Line) duplicate() *Line {
-	if l == nil {
-		panic(nil)
-	}
+func (l Line) duplicate() *Line {
 	newBuf := make([]rune, l.size)
 	copy(newBuf, l.buf)
 	return &Line{
@@ -89,7 +86,7 @@ func (l *Line) duplicate() *Line {
 // moveGap moves l's gap so it starts at position i.
 // moveGap will move the gap to the furthest left or right position possible if
 // i is out of array bounds.
-func (l *Line) moveGap(i int) (newl *Line) {
+func (l Line) moveGap(i int) (newl *Line) {
 	newl = l.duplicate()
 	for newl.start != i {
 		if newl.start < i {

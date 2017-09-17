@@ -202,7 +202,16 @@ func (e *Editor) LineBreak() {
 	}
 }
 
-// func (e *Editor) Back
+// Backspace handles the backspace event
+func (e *Editor) Backspace() {
+	if e.curX == 0 {
+		e.text = e.text.AppendLine(e.curY-1, e.text.Line(e.curY))
+		e.text = e.text.DeleteLine(e.curY)
+		return
+	}
+	e.CursorLeft()
+	e.Delete()
+}
 
 // Save saves the file
 func (e *Editor) Save() {

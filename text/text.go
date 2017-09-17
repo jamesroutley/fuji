@@ -42,11 +42,11 @@ func New(r io.Reader) *Text {
 }
 
 // Line returns the contents of line i
-func (t *Text) Line(row int) *line.Line {
+func (t Text) Line(row int) *line.Line {
 	return t.buf[t.realIndex(row)]
 }
 
-func (t *Text) realIndex(i int) (index int) {
+func (t Text) realIndex(i int) (index int) {
 	index = i
 	if i > t.start {
 		gapSize := t.end - t.start
@@ -56,18 +56,18 @@ func (t *Text) realIndex(i int) (index int) {
 }
 
 // LineLength returns the length of line i
-func (t *Text) LineLength(row int) int {
+func (t Text) LineLength(row int) int {
 	return t.Line(row).Length()
 }
 
 // Length returns the number of lines stored by text
-func (t *Text) Length() int {
+func (t Text) Length() int {
 	gapSize := t.end - t.start
 	return t.size - gapSize
 }
 
 // String returns the contents of text as a string
-func (t *Text) String() string {
+func (t Text) String() string {
 	lines := make([]string, t.Length())
 	i := 0
 	for _, line := range t.buf[:t.start] {
@@ -84,21 +84,21 @@ func (t *Text) String() string {
 // Insert inserts the rune r at (row, col)
 // Note that x must be relative to the start of the document, not the start of
 // the currently displayed view
-func (t *Text) Insert(row, col int, r rune) *Text {
+func (t Text) Insert(row, col int, r rune) *Text {
 	new := t.duplicate()
 	new.buf[new.realIndex(row)] = new.Line(row).Insert(r, col)
 	return new
 }
 
 // Delete deletes the rune at (row, col)
-func (t *Text) Delete(row, col int) *Text {
+func (t Text) Delete(row, col int) *Text {
 	new := t.duplicate()
 	new.buf[new.realIndex(row)] = new.buf[row].Delete(col)
 	return new
 }
 
 // InsertLine inserts l at col
-func (t *Text) InsertLine(row int, l *line.Line) *Text {
+func (t Text) InsertLine(row int, l *line.Line) *Text {
 	new := t.moveGap(row)
 	new.buf[row] = l
 	new.start++
@@ -106,17 +106,17 @@ func (t *Text) InsertLine(row int, l *line.Line) *Text {
 }
 
 // DeleteLine deletes the line at col
-func (t *Text) DeleteLine(row int) *Text {
+func (t Text) DeleteLine(row int) *Text {
 	if t.Length() == 0 {
-		return t
+		return &t
 	}
 	new := t.moveGap(row + 1)
 	new.start--
 	return new
 }
 
-// SplitLine splits a line at (col, row)
-func (t *Text) SplitLine(row, col int) *Text {
+// SplitLine splits a line at (row, col)
+func (t Text) SplitLine(row, col int) *Text {
 	l := t.Line(row)
 	a, b := l.Split(col)
 	new := t.InsertLine(row+1, b)
@@ -124,8 +124,15 @@ func (t *Text) SplitLine(row, col int) *Text {
 	return new
 }
 
+// AppendLine appends line l to the line at (row)
+func (t Text) AppendLine(row int, l *line.Line) *Text {
+	new := t.duplicate()
+	new.buf[new.realIndex(row)] = new.Line(row).Append(l)
+	return new
+}
+
 // duplicate makes a copy of a text object
-func (t *Text) duplicate() *Text {
+func (t Text) duplicate() *Text {
 	buf := make([]*line.Line, len(t.buf))
 	copy(buf, t.buf)
 	return &Text{
@@ -136,7 +143,7 @@ func (t *Text) duplicate() *Text {
 	}
 }
 
-func (t *Text) moveGap(i int) (new *Text) {
+func (t Text) moveGap(i int) (new *Text) {
 	new = t.duplicate()
 	for new.start != i {
 		if new.start < i {
