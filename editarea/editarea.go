@@ -20,6 +20,9 @@ const (
 
 // NormalModeCommand is a function that defines the behaviour of a normal mode
 // command
+// TODO: this type is the same as InsertModeCommand - there really isn't
+// a difference between them. They should be combined. Maybe the type should
+// be called Behaviour?
 type NormalModeCommand func(*EditArea)
 
 // InsertModeCommand defines the behaviour of an insert mode command

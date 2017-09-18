@@ -8,9 +8,7 @@ import (
 )
 
 // Editor implements the main editor
-type Editor struct {
-	editarea editarea.EditArea
-}
+type Editor struct{}
 
 // Start starts the editor
 func (e *Editor) Start(filename string) {
