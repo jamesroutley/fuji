@@ -45,3 +45,4 @@ Todo:
 - don't panic on empty file
 - Running 'a' at the end of a line should move cursor one over
 - expand buffers
+- maybe text.Line() should panic if int is bigger than text.Length?

@@ -205,8 +205,11 @@ func (e *Editor) LineBreak() {
 // Backspace handles the backspace event
 func (e *Editor) Backspace() {
 	if e.curX == 0 {
+		lineAboveLen := e.text.LineLength(e.curY - 1)
 		e.text = e.text.AppendLine(e.curY-1, e.text.Line(e.curY))
 		e.text = e.text.DeleteLine(e.curY)
+		e.CursorUp()
+		e.curX = lineAboveLen
 		return
 	}
 	e.CursorLeft()

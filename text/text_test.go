@@ -26,13 +26,23 @@ world`
 
 func TestRealIndex(t *testing.T) {
 	t.Parallel()
-	source := `hello
-world`
-	text := newTextFromString(source)
-	// Move gap to beginning of buffer
-	text = text.moveGap(0)
-	index := text.realIndex(1)
-	assert.Equal(t, len(text.buf)-1, index)
+	testCases := []struct {
+		source string
+		gapLoc int
+		i      int
+		realI  int
+	}{
+		{"hello\nworld", 0, 1, defaultGapSize + 1},
+		{"hello\nworld", 1, 1, defaultGapSize + 1},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.source, func(t *testing.T) {
+			text := newTextFromString(tc.source)
+			text = text.moveGap(tc.gapLoc)
+			index := text.realIndex(tc.i)
+			assert.Equal(t, tc.realI, index)
+		})
+	}
 }
 
 func TestRealIndexWithSingleLine(t *testing.T) {
@@ -105,10 +115,28 @@ llo`
 
 func TestLength(t *testing.T) {
 	t.Parallel()
-	source := `hello
-world`
-	text := newTextFromString(source)
+	testCases := []struct {
+		source string
+		len    int
+	}{
+		{"hello\nworld", 2},
+		{"1 \n2 \n3 \n4 \n5", 5},
+		{"", 0},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.source, func(t *testing.T) {
+			text := newTextFromString(tc.source)
+			assert.Equal(t, tc.len, text.Length())
+		})
+	}
+}
+
+func TestDeletePreservesLengthCorrectly(t *testing.T) {
+	t.Parallel()
+	text := newTextFromString("hello\nworld")
 	assert.Equal(t, 2, text.Length())
+	text = text.DeleteLine(0)
+	assert.Equal(t, 1, text.Length())
 }
 
 func TestString(t *testing.T) {
@@ -121,4 +149,20 @@ func TestString(t *testing.T) {
 
 func newTextFromString(source string) *Text {
 	return New(strings.NewReader(source))
+}
+
+func (t Text) stringTrue() string {
+	var lines []string
+	for i, line := range t.buf {
+		if i == t.start {
+			lines = append(lines, "s")
+		} else if i == t.end {
+			lines = append(lines, "e")
+		} else if i >= t.start && i < t.end {
+			lines = append(lines, "_")
+		} else {
+			lines = append(lines, line.String())
+		}
+	}
+	return strings.Join(lines, "\n")
 }

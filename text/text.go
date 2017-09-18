@@ -48,7 +48,7 @@ func (t Text) Line(row int) *line.Line {
 
 func (t Text) realIndex(i int) (index int) {
 	index = i
-	if i > t.start {
+	if i >= t.start {
 		gapSize := t.end - t.start
 		index = i + gapSize
 	}

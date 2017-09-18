@@ -1,6 +1,7 @@
 package line
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -54,6 +55,11 @@ func TestDelete(t *testing.T) {
 			1,
 			&Line{[]rune{72, 72, 0, 0}, 1, 4, 4},
 		},
+		{
+			&Line{[]rune{72, 72, 0, 0}, 2, 4, 4},
+			3,
+			&Line{[]rune{72, 72, 0, 0}, 1, 4, 4},
+		},
 	}
 	for _, tc := range testCases {
 		assert.Equal(t, tc.expected, tc.l.Delete(tc.loc))
@@ -82,25 +88,50 @@ func TestDuplicate(t *testing.T) {
 	t.Parallel()
 	l := New("Hello")
 	newl := l.duplicate()
-	assert.Equal(t, l.buf, newl.buf)
-	assert.Equal(t, l.start, newl.start)
-	assert.Equal(t, l.end, newl.end)
-	assert.Equal(t, l.size, newl.size)
+	assert.Equal(t, l, newl)
 }
 
 func TestSplit(t *testing.T) {
 	t.Parallel()
-	l := New("hello")
-	a, b := l.Split(2)
-	assert.Equal(t, "he", a.String())
-	assert.Equal(t, "llo", b.String())
+	testCases := []struct {
+		line                 string
+		split                int
+		expectedA, expectedB string
+	}{
+		{"hello", 2, "he", "llo"},
+		{"", 0, "", ""},
+	}
+
+	for _, tc := range testCases {
+		t.Run(
+			fmt.Sprintf("split '%s' at position %d", tc.line, tc.split),
+			func(t *testing.T) {
+				l := New(tc.line)
+				a, b := l.Split(tc.split)
+				assert.Equal(t, tc.expectedA, a.String())
+				assert.Equal(t, tc.expectedB, b.String())
+			},
+		)
+	}
 }
 
 func TestAppend(t *testing.T) {
 	t.Parallel()
-	l := New("hello ")
-	l = l.Append(New("world"))
-	assert.Equal(t, "hello world", l.String())
+	testCases := []struct {
+		l1, l2, l3 string
+	}{
+		{"hello ", "world", "hello world"},
+		{"", "hello", "hello"},
+		{"hello", "", "hello"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("'%s', '%s'", tc.l1, tc.l2), func(t *testing.T) {
+			l := New(tc.l1)
+			l = l.Append(New(tc.l2))
+			assert.Equal(t, tc.l3, l.String())
+		})
+	}
 }
 
 func TestMoveGap(t *testing.T) {
