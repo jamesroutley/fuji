@@ -39,10 +39,10 @@ func (gb *GapBuffer) String() int
 Todo:
 
 - Sensible cursor movement
-- insert at position 0 is broken
 - read in file if it exists
 - think about how to compose commands - currying???
 - don't panic on empty file
 - Running 'a' at the end of a line should move cursor one over
 - expand buffers
 - maybe text.Line() should panic if int is bigger than text.Length?
+- split editing functions out of editor

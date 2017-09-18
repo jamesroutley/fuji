@@ -2,25 +2,29 @@ package main
 
 import (
 	"github.com/jamesroutley/fuji/commands"
-	"github.com/jamesroutley/fuji/editor"
+	"github.com/jamesroutley/fuji/editarea"
 	termbox "github.com/nsf/termbox-go"
 )
 
-func registerNormalModeCommands(e *editor.Editor) {
-	e.AddNormalModeCommand("j", commands.MoveCursorDown)
-	e.AddNormalModeCommand("k", commands.MoveCursorUp)
-	e.AddNormalModeCommand("h", commands.MoveCursorLeft)
-	e.AddNormalModeCommand("l", commands.MoveCursorRight)
-	e.AddNormalModeCommand("Q", commands.Quit)
-	e.AddNormalModeCommand("i", commands.Insert)
-	e.AddNormalModeCommand("a", commands.Append)
-	e.AddNormalModeCommand("W", commands.Save)
+func registerNormalModeCommands() {
+	editarea.AddNormalModeCommand("j", commands.MoveCursorDown)
+	editarea.AddNormalModeCommand("k", commands.MoveCursorUp)
+	editarea.AddNormalModeCommand("h", commands.MoveCursorLeft)
+	editarea.AddNormalModeCommand("l", commands.MoveCursorRight)
+	editarea.AddNormalModeCommand("Q", commands.Quit)
+	editarea.AddNormalModeCommand("i", commands.Insert)
+	editarea.AddNormalModeCommand("a", commands.Append)
+	editarea.AddNormalModeCommand("W", commands.Save)
 }
 
-func registerInsertModeCommands(e *editor.Editor) {
-	e.AddInsertModeCommand(termbox.KeyEsc, commands.NormalMode)
-	e.AddInsertModeCommand(termbox.KeySpace, commands.Space)
-	e.AddInsertModeCommand(termbox.KeyBackspace, commands.Backspace)
-	e.AddInsertModeCommand(termbox.KeyBackspace2, commands.Backspace)
-	e.AddInsertModeCommand(termbox.KeyEnter, commands.LineBreak)
+func registerInsertModeCommands() {
+	editarea.AddInsertModeCommand(termbox.KeyEsc, commands.NormalMode)
+	editarea.AddInsertModeCommand(termbox.KeySpace, commands.Space)
+	editarea.AddInsertModeCommand(termbox.KeyBackspace, commands.Backspace)
+	editarea.AddInsertModeCommand(termbox.KeyBackspace2, commands.Backspace)
+	editarea.AddInsertModeCommand(termbox.KeyEnter, commands.LineBreak)
+	editarea.AddInsertModeCommand(termbox.KeyArrowDown, commands.MoveCursorDown)
+	editarea.AddInsertModeCommand(termbox.KeyArrowUp, commands.MoveCursorUp)
+	editarea.AddInsertModeCommand(termbox.KeyArrowLeft, commands.MoveCursorLeft)
+	editarea.AddInsertModeCommand(termbox.KeyArrowRight, commands.MoveCursorRight)
 }

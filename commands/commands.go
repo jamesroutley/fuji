@@ -3,36 +3,36 @@ package commands
 import (
 	"os"
 
-	"github.com/jamesroutley/fuji/editor"
+	"github.com/jamesroutley/fuji/editarea"
 	termbox "github.com/nsf/termbox-go"
 )
 
-func MoveCursorUp(e *editor.Editor)    { e.CursorUp() }
-func MoveCursorDown(e *editor.Editor)  { e.CursorDown() }
-func MoveCursorLeft(e *editor.Editor)  { e.CursorLeft() }
-func MoveCursorRight(e *editor.Editor) { e.CursorRight() }
+func MoveCursorUp(e *editarea.EditArea)    { e.CursorUp() }
+func MoveCursorDown(e *editarea.EditArea)  { e.CursorDown() }
+func MoveCursorLeft(e *editarea.EditArea)  { e.CursorLeft() }
+func MoveCursorRight(e *editarea.EditArea) { e.CursorRight() }
 
-func Quit(e *editor.Editor) {
+func Quit(e *editarea.EditArea) {
 	// Set cursor to 0, 0 to avoid clear screen on quit.
 	termbox.SetCursor(0, 0)
 	termbox.Flush()
 	os.Exit(0)
 }
 
-func Insert(e *editor.Editor) { e.Mode = editor.ModeInsert }
-func Append(e *editor.Editor) {
+func Insert(e *editarea.EditArea) { e.Mode = editarea.ModeInsert }
+func Append(e *editarea.EditArea) {
 	e.CursorRight()
-	e.Mode = editor.ModeInsert
+	e.Mode = editarea.ModeInsert
 }
 
-func NormalMode(e *editor.Editor) { e.Mode = editor.ModeNormal }
+func NormalMode(e *editarea.EditArea) { e.Mode = editarea.ModeNormal }
 
-func Space(e *editor.Editor) { e.Insert(' ') }
+func Space(e *editarea.EditArea) { e.Insert(' ') }
 
-func Backspace(e *editor.Editor) {
+func Backspace(e *editarea.EditArea) {
 	e.Backspace()
 }
 
-func Save(e *editor.Editor) { e.Save() }
+func Save(e *editarea.EditArea) { e.Save() }
 
-func LineBreak(e *editor.Editor) { e.LineBreak() }
+func LineBreak(e *editarea.EditArea) { e.LineBreak() }

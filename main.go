@@ -18,8 +18,8 @@ func main() {
 	defer logfile.Close()
 	logger.Init(logfile)
 
-	e := editor.New(filename())
-	registerNormalModeCommands(e)
-	registerInsertModeCommands(e)
-	e.Start()
+	e := editor.Editor{}
+	registerNormalModeCommands()
+	registerInsertModeCommands()
+	e.Start(filename())
 }
