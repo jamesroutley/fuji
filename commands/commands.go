@@ -56,3 +56,9 @@ func LineBreak(e *editarea.EditArea) { e.LineBreak() }
 
 // Delete deletes the character under the cursor
 func Delete(e *editarea.EditArea) { e.Delete() }
+
+// Undo undoes the last action
+func Undo(e *editarea.EditArea) { e.Undo() }
+
+// Redo undoes the last undo
+func Redo(e *editarea.EditArea) { e.Redo() }

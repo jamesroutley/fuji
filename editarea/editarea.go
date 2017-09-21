@@ -34,19 +34,24 @@ var insertModeCommands = make(map[termbox.Key]InsertModeCommand)
 // EditArea exposes the main API of the text editor
 type EditArea struct {
 	Filename   string
+	Mode       Mode
+	history    *history
 	text       *text.Text
 	curX, curY int
-	Mode       Mode
+	beenEdited bool
 }
 
 // New returns a new EditArea
 func New(filename string, r io.ReadWriter) *EditArea {
+	t := text.New(r)
 	return &EditArea{
-		filename,
-		text.New(r),
-		0,
-		0,
-		ModeNormal}
+		Filename: filename,
+		Mode:     ModeNormal,
+		history:  newHistory(t, 0, 0),
+		text:     t,
+		curX:     0,
+		curY:     0,
+	}
 }
 
 // HandleEvent handles the termbox event ev
@@ -98,6 +103,11 @@ func AddInsertModeCommand(key termbox.Key, behaviour InsertModeCommand) {
 // termbox.Flush() should be called after Draw() to write the contents to
 // the screen
 func (e *EditArea) Draw() {
+	if e.beenEdited {
+		e.history.add(e.text, e.curX, e.curY)
+		// logger.L.Print(e.curY)
+		e.beenEdited = false
+	}
 	// Clear screen
 	// TODO: this is a naive way of doing this
 	w, h := termbox.Size()
@@ -190,17 +200,20 @@ func (e *EditArea) CursorAtLineEnd() bool {
 
 // Insert inserts rune r at the cursor position
 func (e *EditArea) Insert(r rune) {
+	e.beenEdited = true
 	e.text = e.text.Insert(e.curY, e.curX, r)
 	e.CursorRight()
 }
 
 // Delete deletes the rune under the cursor
 func (e *EditArea) Delete() {
+	e.beenEdited = true
 	e.text = e.text.Delete(e.curY, e.curX)
 }
 
 // LineBreak inserts a line break at the cursor position
 func (e *EditArea) LineBreak() {
+	e.beenEdited = true
 	e.text = e.text.SplitLine(e.curY, e.curX)
 	e.CursorDown()
 	for e.curX > 0 {
@@ -210,6 +223,7 @@ func (e *EditArea) LineBreak() {
 
 // Backspace handles the backspace event
 func (e *EditArea) Backspace() {
+	e.beenEdited = true
 	if e.curX == 0 && e.curY == 0 {
 		return
 	}
@@ -223,6 +237,22 @@ func (e *EditArea) Backspace() {
 	}
 	e.CursorLeft()
 	e.Delete()
+}
+
+// Undo undoes the last action
+func (e *EditArea) Undo() {
+	e.history.undo()
+	e.text = e.history.head.text
+	e.curX = e.history.head.curX
+	e.curY = e.history.head.curY
+}
+
+// Redo undoes the last undo
+func (e *EditArea) Redo() {
+	e.history.redo()
+	e.text = e.history.head.text
+	e.curX = e.history.head.curX
+	e.curY = e.history.head.curY
 }
 
 // Save saves the file
