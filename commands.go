@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/commands"
 	"github.com/jamesroutley/fuji/editarea"
-	termbox "github.com/nsf/termbox-go"
 )
 
 func registerNormalModeCommands() {
@@ -21,13 +21,13 @@ func registerNormalModeCommands() {
 }
 
 func registerInsertModeCommands() {
-	editarea.AddInsertModeCommand(termbox.KeyEsc, commands.NormalMode)
-	editarea.AddInsertModeCommand(termbox.KeySpace, commands.Space)
-	editarea.AddInsertModeCommand(termbox.KeyBackspace, commands.Backspace)
-	editarea.AddInsertModeCommand(termbox.KeyBackspace2, commands.Backspace)
-	editarea.AddInsertModeCommand(termbox.KeyEnter, commands.LineBreak)
-	editarea.AddInsertModeCommand(termbox.KeyArrowDown, commands.MoveCursorDown)
-	editarea.AddInsertModeCommand(termbox.KeyArrowUp, commands.MoveCursorUp)
-	editarea.AddInsertModeCommand(termbox.KeyArrowLeft, commands.MoveCursorLeft)
-	editarea.AddInsertModeCommand(termbox.KeyArrowRight, commands.MoveCursorRight)
+	editarea.AddInsertModeCommand(tcell.KeyESC, commands.NormalMode)
+	// editarea.AddInsertModeCommand(tcell.KeySpace, commands.Space)
+	editarea.AddInsertModeCommand(tcell.KeyBackspace, commands.Backspace)
+	editarea.AddInsertModeCommand(tcell.KeyBackspace2, commands.Backspace)
+	editarea.AddInsertModeCommand(tcell.KeyEnter, commands.LineBreak)
+	editarea.AddInsertModeCommand(tcell.KeyDown, commands.MoveCursorDown)
+	editarea.AddInsertModeCommand(tcell.KeyUp, commands.MoveCursorUp)
+	editarea.AddInsertModeCommand(tcell.KeyLeft, commands.MoveCursorLeft)
+	editarea.AddInsertModeCommand(tcell.KeyRight, commands.MoveCursorRight)
 }

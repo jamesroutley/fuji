@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/jamesroutley/fuji/editarea"
-	termbox "github.com/nsf/termbox-go"
 )
 
 // MoveCursorUp moves the cursor up
@@ -23,8 +22,8 @@ func MoveCursorRight(e *editarea.EditArea) { e.CursorRight() }
 // Quit quits the editor
 func Quit(e *editarea.EditArea) {
 	// Set cursor to 0, 0 to avoid clear screen on quit.
-	termbox.SetCursor(0, 0)
-	termbox.Flush()
+	// e.screen.ShowCursor(0, 0)
+	// e.screen.Show()
 	os.Exit(0)
 }
 
@@ -39,9 +38,6 @@ func Append(e *editarea.EditArea) {
 
 // NormalMode switches the EditArea into normal mode
 func NormalMode(e *editarea.EditArea) { e.Mode = editarea.ModeNormal }
-
-// Space inserts a space
-func Space(e *editarea.EditArea) { e.Insert(' ') }
 
 // Backspace deletes the previous rune
 func Backspace(e *editarea.EditArea) {

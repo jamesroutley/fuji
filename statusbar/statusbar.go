@@ -3,12 +3,21 @@ package statusbar
 import (
 	"strings"
 
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 // StatusBar implements the status bar.
 // The status bar is intended for global information.
-type StatusBar struct{}
+type StatusBar struct {
+	screen tcell.Screen
+}
+
+// New initialises and returns a new StatusBar
+func New(screen tcell.Screen) *StatusBar {
+	return &StatusBar{
+		screen: screen,
+	}
+}
 
 // Status is a function which, when called, returns some status string
 type Status func() string
@@ -17,11 +26,13 @@ var statusItems []Status
 
 // Draw draws the status bar
 func (s *StatusBar) Draw() {
-	xmax, y := termbox.Size()
+	xmax, y := s.screen.Size()
 	// statuses := getStatuses(" / ")
 
+	style := tcell.StyleDefault.Background(tcell.ColorDarkGray)
+
 	for x := 0; x < xmax; x++ {
-		termbox.SetCell(x, y-1, ' ', termbox.ColorDefault, termbox.ColorCyan)
+		s.screen.SetContent(x, y-1, ' ', nil, style)
 	}
 
 }
