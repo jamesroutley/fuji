@@ -13,12 +13,13 @@ type state struct {
 // history implements an EditArea's undo and redo functionality.
 // It is a doubly linked list of states.
 type history struct {
-	head *state
-	tail *state
+	head        *state
+	tail        *state
+	len, maxLen int
 }
 
 // newHistory instantiates a new history object
-func newHistory(t *text.Text, curX, curY int) *history {
+func newHistory(t *text.Text, curX, curY, maxLen int) *history {
 	s := &state{
 		text: t,
 		curX: curX,
@@ -26,11 +27,14 @@ func newHistory(t *text.Text, curX, curY int) *history {
 		next: nil,
 		prev: nil,
 	}
-	return &history{head: s, tail: s}
+	return &history{head: s, tail: s, len: 0, maxLen: maxLen}
 }
 
 // add adds a state to the history
 func (h *history) add(t *text.Text, curX, curY int) {
+	if h.len > h.maxLen {
+		h.forget()
+	}
 	s := &state{
 		text: t,
 		curX: curX,
@@ -40,12 +44,14 @@ func (h *history) add(t *text.Text, curX, curY int) {
 	}
 	h.head.next = s
 	h.head = s
+	h.len++
 }
 
 // forget forgets the oldest state.
 func (h *history) forget() {
 	h.tail = h.tail.next
 	h.tail.prev = nil
+	h.len--
 }
 
 // undo puts h.head into a previous state
@@ -54,6 +60,7 @@ func (h *history) undo() {
 		return
 	}
 	h.head = h.head.prev
+	h.len--
 }
 
 // redo puts h.head into a future state
@@ -62,4 +69,5 @@ func (h *history) redo() {
 		return
 	}
 	h.head = h.head.next
+	h.len++
 }

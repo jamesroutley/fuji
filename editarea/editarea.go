@@ -47,7 +47,7 @@ func New(filename string, r io.ReadWriter) *EditArea {
 	return &EditArea{
 		Filename: filename,
 		Mode:     ModeNormal,
-		history:  newHistory(t, 0, 0),
+		history:  newHistory(t, 0, 0, 50),
 		text:     t,
 		curX:     0,
 		curY:     0,
@@ -105,7 +105,6 @@ func AddInsertModeCommand(key termbox.Key, behaviour InsertModeCommand) {
 func (e *EditArea) Draw() {
 	if e.beenEdited {
 		e.history.add(e.text, e.curX, e.curY)
-		// logger.L.Print(e.curY)
 		e.beenEdited = false
 	}
 	// Clear screen
