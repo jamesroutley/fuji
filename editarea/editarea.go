@@ -94,7 +94,9 @@ func AddInsertModeCommand(key termbox.Key, behaviour InsertModeCommand) {
 	insertModeCommands[key] = behaviour
 }
 
-// Draw displays the contents of the editor
+// Draw writes the contents of the EditArea to termbox's internal buffer.
+// termbox.Flush() should be called after Draw() to write the contents to
+// the screen
 func (e *EditArea) Draw() {
 	// Clear screen
 	// TODO: this is a naive way of doing this

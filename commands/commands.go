@@ -53,3 +53,6 @@ func Save(e *editarea.EditArea) { e.Save() }
 
 // LineBreak inserts a line break
 func LineBreak(e *editarea.EditArea) { e.LineBreak() }
+
+// Delete deletes the character under the cursor
+func Delete(e *editarea.EditArea) { e.Delete() }

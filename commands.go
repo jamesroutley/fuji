@@ -15,6 +15,7 @@ func registerNormalModeCommands() {
 	editarea.AddNormalModeCommand("i", commands.Insert)
 	editarea.AddNormalModeCommand("a", commands.Append)
 	editarea.AddNormalModeCommand("W", commands.Save)
+	editarea.AddNormalModeCommand("x", commands.Delete)
 }
 
 func registerInsertModeCommands() {
