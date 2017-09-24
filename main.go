@@ -21,5 +21,6 @@ func main() {
 	e := editor.Editor{}
 	registerNormalModeCommands()
 	registerInsertModeCommands()
+	registerStatuses()
 	e.Start(filename())
 }

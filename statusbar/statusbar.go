@@ -7,46 +7,31 @@ import (
 )
 
 // StatusBar implements the status bar.
-// The status bar is intended for global information.
+// The status bar is intended for information relevant to an edit area.
 type StatusBar struct {
 	screen tcell.Screen
 }
 
 // New initialises and returns a new StatusBar
 func New(screen tcell.Screen) *StatusBar {
-	return &StatusBar{
-		screen: screen,
-	}
+	return &StatusBar{screen: screen}
 }
-
-// Status is a function which, when called, returns some status string
-type Status func() string
-
-var statusItems []Status
 
 // Draw draws the status bar
-func (s *StatusBar) Draw() {
+func (s *StatusBar) Draw(statuses []string) {
+	offset := 1
 	xmax, y := s.screen.Size()
-	// statuses := getStatuses(" / ")
+	content := strings.Join(statuses, " / ")
 
-	style := tcell.StyleDefault.Background(tcell.ColorDarkGray)
+	style := tcell.StyleDefault.
+		Background(tcell.ColorDarkGray).
+		Foreground(tcell.ColorBlack)
 
 	for x := 0; x < xmax; x++ {
-		s.screen.SetContent(x, y-1, ' ', nil, style)
+		s.screen.SetContent(x, y-2, ' ', nil, style)
 	}
 
-}
-
-// AddStatus adds a status to the bar. Statuses are displayed in the order
-// they were added
-func AddStatus(s Status) {
-	statusItems = append(statusItems, s)
-}
-
-func getStatuses(sep string) string {
-	statuses := make([]string, len(statusItems))
-	for i, item := range statusItems {
-		statuses[i] = item()
+	for x, r := range content {
+		s.screen.SetContent(x+offset, y-2, r, nil, style)
 	}
-	return strings.Join(statuses, sep)
 }

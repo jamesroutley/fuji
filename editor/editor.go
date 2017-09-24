@@ -5,7 +5,6 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/editarea"
-	"github.com/jamesroutley/fuji/statusbar"
 )
 
 // Editor implements the main editor
@@ -28,10 +27,8 @@ func (e *Editor) Start(filename string) {
 	}
 	defer file.Close()
 	editarea := editarea.New(screen, filename, file)
-	statusBar := statusbar.New(screen)
 
 	editarea.Draw()
-	statusBar.Draw()
 
 	for {
 		ev := screen.PollEvent()
@@ -42,8 +39,6 @@ func (e *Editor) Start(filename string) {
 			// do something
 		}
 		editarea.Draw()
-		statusBar.Draw()
-
 		screen.Show()
 	}
 }

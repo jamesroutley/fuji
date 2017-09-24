@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gdamore/tcell"
+	"github.com/jamesroutley/fuji/statusbar"
 	"github.com/jamesroutley/fuji/text"
 )
 
@@ -31,6 +32,8 @@ type InsertModeCommand func(*EditArea)
 var normalModeCommands = make(map[string]NormalModeCommand)
 var insertModeCommands = make(map[tcell.Key]InsertModeCommand)
 
+var statuses []func(*EditArea) string
+
 // EditArea exposes the main API of the text editor
 type EditArea struct {
 	Filename   string
@@ -40,19 +43,22 @@ type EditArea struct {
 	curX, curY int
 	beenEdited bool
 	screen     tcell.Screen
+	statusBar  *statusbar.StatusBar
 }
 
 // New returns a new EditArea
 func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 	t := text.New(r)
+	statusBar := statusbar.New(screen)
 	return &EditArea{
-		Filename: filename,
-		Mode:     ModeNormal,
-		history:  newHistory(t, 0, 0, 50),
-		text:     t,
-		curX:     0,
-		curY:     0,
-		screen:   screen,
+		Filename:  filename,
+		Mode:      ModeNormal,
+		history:   newHistory(t, 0, 0, 50),
+		text:      t,
+		curX:      0,
+		curY:      0,
+		screen:    screen,
+		statusBar: statusBar,
 	}
 }
 
@@ -101,6 +107,11 @@ func AddInsertModeCommand(key tcell.Key, behaviour InsertModeCommand) {
 	insertModeCommands[key] = behaviour
 }
 
+// AddStatus adds a new status function
+func AddStatus(status func(*EditArea) string) {
+	statuses = append(statuses, status)
+}
+
 // Draw writes the contents of the EditArea to tcell's internal buffer.
 // screen.Show() should be called after Draw() to write the contents to
 // the screen
@@ -118,6 +129,12 @@ func (e *EditArea) Draw() {
 		}
 	}
 	e.displayCursor()
+
+	content := make([]string, len(statuses))
+	for i, status := range statuses {
+		content[i] = status(e)
+	}
+	e.statusBar.Draw(content)
 }
 
 func (e *EditArea) displayCursor() {
