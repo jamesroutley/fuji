@@ -18,11 +18,14 @@ func registerNormalModeCommands() {
 	editarea.AddNormalModeCommand("x", commands.Delete)
 	editarea.AddNormalModeCommand("u", commands.Undo)
 	editarea.AddNormalModeCommand("R", commands.Redo)
+	editarea.AddNormalModeCommand("^", commands.JmpToLineStart)
+	editarea.AddNormalModeCommand("$", commands.JmpToLineEnd)
+	editarea.AddNormalModeCommand("b", commands.JmpToWordStart)
+	editarea.AddNormalModeCommand("w", commands.JmpToWordEnd)
 }
 
 func registerInsertModeCommands() {
 	editarea.AddInsertModeCommand(tcell.KeyESC, commands.NormalMode)
-	// editarea.AddInsertModeCommand(tcell.KeySpace, commands.Space)
 	editarea.AddInsertModeCommand(tcell.KeyBackspace, commands.Backspace)
 	editarea.AddInsertModeCommand(tcell.KeyBackspace2, commands.Backspace)
 	editarea.AddInsertModeCommand(tcell.KeyEnter, commands.LineBreak)

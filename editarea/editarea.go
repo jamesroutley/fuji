@@ -42,6 +42,7 @@ type EditArea struct {
 	text       *text.Text
 	curX, curY int
 	beenEdited bool
+	beenSaved  bool
 	screen     tcell.Screen
 	statusBar  *statusbar.StatusBar
 }
@@ -51,14 +52,16 @@ func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 	t := text.New(r)
 	statusBar := statusbar.New(screen)
 	return &EditArea{
-		Filename:  filename,
-		Mode:      ModeNormal,
-		history:   newHistory(t, 0, 0, 50),
-		text:      t,
-		curX:      0,
-		curY:      0,
-		screen:    screen,
-		statusBar: statusBar,
+		Filename:   filename,
+		Mode:       ModeNormal,
+		history:    newHistory(t, 0, 0, 50),
+		text:       t,
+		curX:       0,
+		curY:       0,
+		beenEdited: false,
+		beenSaved:  true,
+		screen:     screen,
+		statusBar:  statusBar,
 	}
 }
 
@@ -207,17 +210,29 @@ func (e *EditArea) CursorAtLineEnd() bool {
 	return e.curX == e.text.LineLength(e.curY)-1
 }
 
+// CursorAtTextStart returns whether the cursor is at the beginning of the text
+func (e *EditArea) CursorAtTextStart() bool {
+	return e.curY == 0
+}
+
+// CursorAtTextEnd returns whether the cursor is at the end of the text
+func (e *EditArea) CursorAtTextEnd() bool {
+	return e.curY == e.text.Length()-1
+}
+
 // Insert inserts rune r at the cursor position
 func (e *EditArea) Insert(r rune) {
 	e.beenEdited = true
 	e.text = e.text.Insert(e.curY, e.curX, r)
 	e.CursorRight()
+	e.beenSaved = false
 }
 
 // Delete deletes the rune under the cursor
 func (e *EditArea) Delete() {
 	e.beenEdited = true
 	e.text = e.text.Delete(e.curY, e.curX)
+	e.beenSaved = false
 }
 
 // LineBreak inserts a line break at the cursor position
@@ -228,6 +243,7 @@ func (e *EditArea) LineBreak() {
 	for e.curX > 0 {
 		e.CursorLeft()
 	}
+	e.beenSaved = false
 }
 
 // Backspace handles the backspace event
@@ -246,6 +262,13 @@ func (e *EditArea) Backspace() {
 	}
 	e.CursorLeft()
 	e.Delete()
+	e.beenSaved = false
+}
+
+// Peek returns the rune under the cursor
+func (e *EditArea) Peek() (r rune) {
+	r, _, _, _ = e.screen.GetContent(e.curX, e.curY)
+	return
 }
 
 // Undo undoes the last action
@@ -276,4 +299,10 @@ func (e *EditArea) Save() {
 		panic(err)
 	}
 	f.Sync()
+	e.beenSaved = true
+}
+
+// Saved returns a boolean indicating whether the current file has been saved
+func (e *EditArea) Saved() bool {
+	return e.beenSaved
 }

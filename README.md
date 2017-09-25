@@ -45,4 +45,5 @@ Todo:
 - Running 'a' at the end of a line should move cursor one over
 - expand buffers
 - maybe text.Line() should panic if int is bigger than text.Length?
-- split editing functions out of editor
+- Line nums
+- Git diff

@@ -22,7 +22,10 @@ func Mode(e *editarea.EditArea) string {
 // Filename return the name of the file being edited
 func Filename(e *editarea.EditArea) string {
 	_, fn := filepath.Split(e.Filename)
-	return fn
+	if e.Saved() {
+		return fn
+	}
+	return fn + " *"
 }
 
 // GitBranch returns the current git branch

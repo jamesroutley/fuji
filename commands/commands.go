@@ -44,6 +44,47 @@ func Backspace(e *editarea.EditArea) {
 	e.Backspace()
 }
 
+// JmpToLineEnd moves cursor to line end
+func JmpToLineEnd(e *editarea.EditArea) {
+	for !e.CursorAtLineEnd() {
+		e.CursorRight()
+	}
+}
+
+// JmpToLineStart moves the cursor to line start
+func JmpToLineStart(e *editarea.EditArea) {
+	for !e.CursorAtLineStart() {
+		e.CursorLeft()
+	}
+}
+
+// JmpToWordStart moves the cursor to the beginning of the word
+// TODO: this won't stop at non-space chars like . or (
+func JmpToWordStart(e *editarea.EditArea) {
+	// This is a hack to allow the command to be run repeatedly to jump back
+	// multiple words
+	e.CursorLeft()
+	e.CursorLeft()
+	for e.Peek() != ' ' {
+		if e.CursorAtLineStart() {
+			return
+		}
+		e.CursorLeft()
+	}
+	e.CursorRight()
+}
+
+// JmpToWordEnd moves the cursor the the beginning of the next word
+func JmpToWordEnd(e *editarea.EditArea) {
+	for e.Peek() != ' ' {
+		if e.CursorAtTextEnd() && e.CursorAtLineEnd() {
+			return
+		}
+		e.CursorRight()
+	}
+	e.CursorRight()
+}
+
 // Save saves the file being edited
 func Save(e *editarea.EditArea) { e.Save() }
 
