@@ -6,6 +6,7 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/statusbar"
+	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
 
@@ -136,6 +137,8 @@ func (e *EditArea) Draw() {
 		content[i] = status(e)
 	}
 	e.statusBar.Draw(content)
+
+	syntax.Highlight("dracula", e.Filename, e.text.String())
 }
 
 func (e *EditArea) displayCursor() {
