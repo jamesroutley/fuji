@@ -123,8 +123,6 @@ func (e *EditArea) Draw() {
 		e.history.add(e.text, e.curX, e.curY)
 		e.beenEdited = false
 	}
-	// Clear screen
-	e.screen.Clear()
 	for y := 0; y < e.text.Length(); y++ {
 		line := e.text.Line(y)
 		for x, r := range line.String() {

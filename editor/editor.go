@@ -38,6 +38,7 @@ func (e *Editor) Start(filename string) {
 		default:
 			// do something
 		}
+		screen.Clear()
 		editarea.Draw()
 		screen.Show()
 	}
