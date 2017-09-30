@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/jamesroutley/fuji/editarea"
+	"github.com/jamesroutley/fuji/statusbar"
 	status "github.com/jamesroutley/fuji/statuses"
 )
 
 func registerStatuses() {
-	editarea.AddStatus(status.Mode)
-	editarea.AddStatus(status.Filename)
-	editarea.AddStatus(status.GitBranch)
+	statusbar.AddStatus(status.Mode)
+	statusbar.AddStatus(status.Filename)
+	statusbar.AddStatus(status.GitBranch)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
 	"github.com/gdamore/tcell"
+	"github.com/jamesroutley/fuji/area"
 	"github.com/jamesroutley/fuji/logger"
-	"github.com/jamesroutley/fuji/statusbar"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
@@ -37,8 +37,6 @@ type InsertModeCommand func(*EditArea)
 var normalModeCommands = make(map[string]NormalModeCommand)
 var insertModeCommands = make(map[tcell.Key]InsertModeCommand)
 
-var statuses []func(*EditArea) string
-
 // EditArea exposes the main API of the text editor
 type EditArea struct {
 	Filename   string
@@ -49,13 +47,12 @@ type EditArea struct {
 	beenEdited bool
 	beenSaved  bool
 	screen     tcell.Screen
-	statusBar  *statusbar.StatusBar
+	lineno     int
 }
 
 // New returns a new EditArea
 func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 	t := text.New(r)
-	statusBar := statusbar.New(screen)
 	return &EditArea{
 		Filename:   filename,
 		Mode:       ModeNormal,
@@ -66,7 +63,7 @@ func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 		beenEdited: false,
 		beenSaved:  true,
 		screen:     screen,
-		statusBar:  statusBar,
+		lineno:     0,
 	}
 }
 
@@ -115,15 +112,10 @@ func AddInsertModeCommand(key tcell.Key, behaviour InsertModeCommand) {
 	insertModeCommands[key] = behaviour
 }
 
-// AddStatus adds a new status function
-func AddStatus(status func(*EditArea) string) {
-	statuses = append(statuses, status)
-}
-
 // Draw writes the contents of the EditArea to tcell's internal buffer.
 // screen.Show() should be called after Draw() to write the contents to
 // the screen
-func (e *EditArea) Draw() {
+func (e *EditArea) Draw(a area.Area) {
 	if e.beenEdited {
 		e.history.add(e.text, e.curX, e.curY)
 		e.beenEdited = false
@@ -157,7 +149,8 @@ func (e *EditArea) Draw() {
 		styledRunes = append(styledRunes, tokenToStyledRunes(token, style)...)
 	}
 
-	var x, y int
+	x := e.lineno
+	y := 0
 	for _, sr := range styledRunes {
 		switch sr.r {
 		case '\n':
@@ -172,17 +165,12 @@ func (e *EditArea) Draw() {
 			logger.L.Print(x)
 			e.screen.SetContent(x, y, sr.r, nil, sr.style)
 			x++
-
+		}
+		if y >= a.End.Y {
+			break
 		}
 	}
 	e.displayCursor()
-
-	content := make([]string, len(statuses))
-	for i, status := range statuses {
-		content[i] = status(e)
-	}
-	e.statusBar.Draw(content)
-
 	syntax.Highlight("dracula", e.Filename, e.text.String())
 }
 

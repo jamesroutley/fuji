@@ -1,10 +1,9 @@
 package editor
 
 import (
-	"os"
-
 	"github.com/gdamore/tcell"
-	"github.com/jamesroutley/fuji/editarea"
+	"github.com/jamesroutley/fuji/area"
+	"github.com/jamesroutley/fuji/pane"
 )
 
 // Editor implements the main editor
@@ -21,25 +20,25 @@ func (e *Editor) Start(filename string) {
 	}
 	defer screen.Fini()
 
-	file, err := os.Open(filename)
-	if err != nil {
-		panic("cannot open file: " + filename)
+	xMax, yMax := screen.Size()
+	// TODO: yMax - 1 because of tmux - find some way to fix this
+	area := area.Area{
+		area.Point{X: 0, Y: 0}, area.Point{X: xMax, Y: yMax - 1},
 	}
-	defer file.Close()
-	editarea := editarea.New(screen, filename, file)
+	editpane := pane.NewEditPane(filename, screen, area)
 
-	editarea.Draw()
+	editpane.Draw()
 
 	for {
 		ev := screen.PollEvent()
 		switch ev := ev.(type) {
 		case *tcell.EventKey:
-			editarea.HandleEvent(ev)
+			editpane.HandleEvent(ev)
 		default:
 			// do something
 		}
 		screen.Clear()
-		editarea.Draw()
+		editpane.Draw()
 		screen.Show()
 	}
 }
