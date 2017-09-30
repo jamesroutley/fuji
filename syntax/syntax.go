@@ -15,6 +15,12 @@ type StyledRune struct {
 	Style tcell.Style
 }
 
+// Background returns the background style
+func Background() tcell.Style {
+	styleEntry := style.Get(chroma.Background)
+	return chromaStyleToTcellStyle(styleEntry)
+}
+
 // Highlight highlights a string
 func Highlight(filename, text string) []StyledRune {
 	lexer := lexers.Match(filename)

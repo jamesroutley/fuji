@@ -4,6 +4,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
 	"github.com/jamesroutley/fuji/pane"
+	"github.com/jamesroutley/fuji/syntax"
 )
 
 // Editor implements the main editor
@@ -37,7 +38,7 @@ func (e *Editor) Start(filename string) {
 		default:
 			// do something
 		}
-		screen.Clear()
+		screen.Fill(' ', syntax.Background())
 		editpane.Draw()
 		screen.Show()
 	}
