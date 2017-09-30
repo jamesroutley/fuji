@@ -38,7 +38,6 @@ func (gb *GapBuffer) String() int
 
 Todo:
 
-- Sensible cursor movement
 - read in file if it exists
 - think about how to compose commands - currying???
 - don't panic on empty file
@@ -47,3 +46,6 @@ Todo:
 - maybe text.Line() should panic if int is bigger than text.Length?
 - Line nums
 - Git diff
+- Quit sensibly -- Q should call EditArea.Quit. Editor should check for active
+  buffers and close everything if there are none
+- Copy/paste

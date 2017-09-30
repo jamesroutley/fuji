@@ -1,8 +1,10 @@
 package syntax
 
 import (
+	"io"
 	"os"
 
+	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/formatters"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
@@ -42,4 +44,20 @@ func Highlight(stylename, filename, body string) {
 	if err := formatter.Format(f, style, iterator); err != nil {
 		panic(err)
 	}
+}
+
+type tcellFormatter struct{}
+
+func (t *tcellFormatter) Format(w io.Writer, style *chroma.Style, it chroma.Iterator) (err error) {
+	defer func() {
+		if perr := recover(); perr != nil {
+			err = perr.(error)
+		}
+	}()
+
+	for token := it(); token != nil; token = it() {
+
+	}
+
+	return nil
 }

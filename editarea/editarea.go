@@ -4,7 +4,11 @@ import (
 	"io"
 	"os"
 
+	"github.com/alecthomas/chroma"
+	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 	"github.com/gdamore/tcell"
+	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/statusbar"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
@@ -124,10 +128,51 @@ func (e *EditArea) Draw() {
 		e.history.add(e.text, e.curX, e.curY)
 		e.beenEdited = false
 	}
-	for y := 0; y < e.text.Length(); y++ {
-		line := e.text.Line(y)
-		for x, r := range line.String() {
-			e.screen.SetContent(x, y, r, nil, tcell.StyleDefault)
+
+	// TODO: Need to do this in case the iterator panics
+	// defer func() {
+	// 	if perr := recover(); perr != nil {
+	// 		err = perr.(error)
+	// 	}
+	// }()
+
+	lexer := lexers.Match(e.Filename)
+	if lexer == nil {
+		lexer = lexers.Fallback
+	}
+	style := styles.Get("dracula")
+	if style == nil {
+		style = styles.Fallback
+	}
+	iterator, err := lexer.Tokenise(nil, e.text.String())
+	if err != nil {
+		// TODO: this probably shouldn't panic - maybe return a
+		// non-highlighted string?
+		panic(err)
+	}
+
+	tokens := iterator.Tokens()
+	var styledRunes []styledRune
+	for _, token := range tokens {
+		styledRunes = append(styledRunes, tokenToStyledRunes(token, style)...)
+	}
+
+	var x, y int
+	for _, sr := range styledRunes {
+		switch sr.r {
+		case '\n':
+			x = 0
+			y++
+		case '\t':
+			for i := 0; i < 4; i++ {
+				e.screen.SetContent(x, y, ' ', nil, sr.style)
+				x++
+			}
+		default:
+			logger.L.Print(x)
+			e.screen.SetContent(x, y, sr.r, nil, sr.style)
+			x++
+
 		}
 	}
 	e.displayCursor()
@@ -139,6 +184,41 @@ func (e *EditArea) Draw() {
 	e.statusBar.Draw(content)
 
 	syntax.Highlight("dracula", e.Filename, e.text.String())
+}
+
+type styledRune struct {
+	r     rune
+	style tcell.Style
+}
+
+func tokenToStyledRunes(t *chroma.Token, s *chroma.Style) []styledRune {
+	styleEntry := s.Get(t.Type)
+	style := chromaStyleToTcellStyle(styleEntry)
+	// hacky
+	// TODO: getting the len of t.Value may not work for unicode
+	runes := make([]styledRune, len(t.Value))
+	for i, r := range t.Value {
+		runes[i] = styledRune{
+			r:     r,
+			style: style,
+		}
+	}
+	return runes
+}
+
+func chromaStyleToTcellStyle(se chroma.StyleEntry) (s tcell.Style) {
+	s = tcell.StyleDefault
+	s = s.Background(chromaToTcellColour(se.Background))
+	s = s.Foreground(chromaToTcellColour(se.Colour))
+	return
+}
+
+func chromaToTcellColour(c chroma.Colour) tcell.Color {
+	return tcell.NewRGBColor(
+		int32(c.Red()),
+		int32(c.Green()),
+		int32(c.Blue()),
+	)
 }
 
 func (e *EditArea) displayCursor() {
