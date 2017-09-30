@@ -4,9 +4,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/alecthomas/chroma"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
 	"github.com/jamesroutley/fuji/logger"
@@ -128,42 +125,24 @@ func (e *EditArea) Draw(a area.Area) {
 	// 	}
 	// }()
 
-	lexer := lexers.Match(e.Filename)
-	if lexer == nil {
-		lexer = lexers.Fallback
-	}
-	style := styles.Get("dracula")
-	if style == nil {
-		style = styles.Fallback
-	}
-	iterator, err := lexer.Tokenise(nil, e.text.String())
-	if err != nil {
-		// TODO: this probably shouldn't panic - maybe return a
-		// non-highlighted string?
-		panic(err)
-	}
+	styledRunes := syntax.Highlight(e.Filename, e.text.String())
 
-	tokens := iterator.Tokens()
-	var styledRunes []styledRune
-	for _, token := range tokens {
-		styledRunes = append(styledRunes, tokenToStyledRunes(token, style)...)
-	}
-
+	logger.L.Print(styledRunes)
 	x := e.lineno
 	y := 0
 	for _, sr := range styledRunes {
-		switch sr.r {
+		logger.L.Print(x)
+		switch sr.Rune {
 		case '\n':
 			x = 0
 			y++
 		case '\t':
 			for i := 0; i < 4; i++ {
-				e.screen.SetContent(x, y, ' ', nil, sr.style)
+				e.screen.SetContent(x, y, ' ', nil, sr.Style)
 				x++
 			}
 		default:
-			logger.L.Print(x)
-			e.screen.SetContent(x, y, sr.r, nil, sr.style)
+			e.screen.SetContent(x, y, sr.Rune, nil, sr.Style)
 			x++
 		}
 		if y >= a.End.Y {
@@ -171,44 +150,7 @@ func (e *EditArea) Draw(a area.Area) {
 		}
 	}
 	e.displayCursor()
-	syntax.Highlight("dracula", e.Filename, e.text.String())
 }
-
-type styledRune struct {
-	r     rune
-	style tcell.Style
-}
-
-func tokenToStyledRunes(t *chroma.Token, s *chroma.Style) []styledRune {
-	styleEntry := s.Get(t.Type)
-	style := chromaStyleToTcellStyle(styleEntry)
-	// hacky
-	// TODO: getting the len of t.Value may not work for unicode
-	runes := make([]styledRune, len(t.Value))
-	for i, r := range t.Value {
-		runes[i] = styledRune{
-			r:     r,
-			style: style,
-		}
-	}
-	return runes
-}
-
-func chromaStyleToTcellStyle(se chroma.StyleEntry) (s tcell.Style) {
-	s = tcell.StyleDefault
-	s = s.Background(chromaToTcellColour(se.Background))
-	s = s.Foreground(chromaToTcellColour(se.Colour))
-	return
-}
-
-func chromaToTcellColour(c chroma.Colour) tcell.Color {
-	return tcell.NewRGBColor(
-		int32(c.Red()),
-		int32(c.Green()),
-		int32(c.Blue()),
-	)
-}
-
 func (e *EditArea) displayCursor() {
 	x := e.curX
 	lineLength := e.text.LineLength(e.curY)
