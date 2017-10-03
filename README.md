@@ -38,6 +38,7 @@ func (gb *GapBuffer) String() int
 
 Todo:
 
+- scrolling
 - read in file if it exists
 - think about how to compose commands - currying???
 - don't panic on empty file

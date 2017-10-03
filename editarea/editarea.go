@@ -44,6 +44,7 @@ type EditArea struct {
 	beenSaved  bool
 	screen     tcell.Screen
 	lineno     int
+	displayLen int
 }
 
 // New returns a new EditArea
@@ -60,6 +61,7 @@ func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 		beenSaved:  true,
 		screen:     screen,
 		lineno:     0,
+		displayLen: 0,
 	}
 }
 
@@ -112,6 +114,7 @@ func AddInsertModeCommand(key tcell.Key, behaviour InsertModeCommand) {
 // screen.Show() should be called after Draw() to write the contents to
 // the screen
 func (e *EditArea) Draw(a area.Area) {
+	e.displayLen = a.End.Y - a.Start.Y
 	if e.beenEdited {
 		e.history.add(e.text, e.curX, e.curY)
 		e.beenEdited = false
@@ -126,28 +129,23 @@ func (e *EditArea) Draw(a area.Area) {
 
 	styledRunes := syntax.Highlight(e.Filename, e.text.String())
 
-	x := e.lineno
-	y := 0
-	for _, sr := range styledRunes {
-		switch sr.Rune {
-		case '\n':
-			x = 0
-			y++
-		case '\t':
-			for i := 0; i < 4; i++ {
-				e.screen.SetContent(x, y, ' ', nil, sr.Style)
+	for y := a.Start.Y; y < a.End.Y; y++ {
+		for x, sr := range styledRunes[y+e.lineno] {
+			switch sr.Rune {
+			case '\t':
+				for i := 0; i < 4; i++ {
+					e.screen.SetContent(x, y, ' ', nil, sr.Style)
+					x++
+				}
+			default:
+				e.screen.SetContent(x, y, sr.Rune, nil, sr.Style)
 				x++
 			}
-		default:
-			e.screen.SetContent(x, y, sr.Rune, nil, sr.Style)
-			x++
-		}
-		if y >= a.End.Y {
-			break
 		}
 	}
 	e.displayCursor()
 }
+
 func (e *EditArea) displayCursor() {
 	x := e.curX
 	lineLength := e.text.LineLength(e.curY)
@@ -163,18 +161,24 @@ func (e *EditArea) displayCursor() {
 
 // CursorUp moves the cursor up
 func (e *EditArea) CursorUp() {
-	if e.curY == 0 {
+	if e.curY+e.lineno == 0 {
 		return
 	}
 	e.curY--
+	if e.curY < 10 && e.lineno > 0 {
+		e.lineno--
+	}
 }
 
 // CursorDown moves the cursor down
 func (e *EditArea) CursorDown() {
-	if e.curY >= e.text.Length()-1 {
+	if e.curY+e.lineno >= e.text.Length()-1 {
 		return
 	}
 	e.curY++
+	if e.displayLen-e.curY < 10 && e.lineno+e.displayLen < e.text.Length() {
+		e.lineno++
+	}
 }
 
 // CursorLeft moves the cursor left

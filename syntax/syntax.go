@@ -22,7 +22,7 @@ func Background() tcell.Style {
 }
 
 // Highlight highlights a string
-func Highlight(filename, text string) []StyledRune {
+func Highlight(filename, text string) [][]StyledRune {
 	lexer := lexers.Match(filename)
 	if lexer == nil {
 		lexer = lexers.Fallback
@@ -44,7 +44,23 @@ func Highlight(filename, text string) []StyledRune {
 		styledRunes = append(styledRunes, tokenToStyledRunes(token, style)...)
 	}
 
-	return styledRunes
+	return split(styledRunes, '\n')
+}
+
+func split(styledRunes []StyledRune, sep rune) [][]StyledRune {
+	var word []StyledRune
+	var result [][]StyledRune
+	for _, sr := range styledRunes {
+		if sr.Rune == sep {
+			result = append(result, word)
+			word = []StyledRune{}
+		} else {
+			word = append(word, sr)
+		}
+	}
+	result = append(result, word)
+
+	return result
 }
 
 func tokenToStyledRunes(t *chroma.Token, s *chroma.Style) []StyledRune {
