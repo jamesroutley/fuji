@@ -3,6 +3,7 @@ package editor
 import (
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
+	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/pane"
 	"github.com/jamesroutley/fuji/syntax"
 )
@@ -13,6 +14,7 @@ type Editor struct{}
 // Start starts the editor
 func (e *Editor) Start(filename string) {
 	screen, err := tcell.NewScreen()
+	logger.L.Print(screen.Colors())
 	if err != nil {
 		panic(err)
 	}

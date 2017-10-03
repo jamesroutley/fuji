@@ -6,7 +6,6 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
-	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
@@ -127,11 +126,9 @@ func (e *EditArea) Draw(a area.Area) {
 
 	styledRunes := syntax.Highlight(e.Filename, e.text.String())
 
-	logger.L.Print(styledRunes)
 	x := e.lineno
 	y := 0
 	for _, sr := range styledRunes {
-		logger.L.Print(x)
 		switch sr.Rune {
 		case '\n':
 			x = 0
