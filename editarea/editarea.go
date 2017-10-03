@@ -2,6 +2,7 @@ package editarea
 
 import (
 	"io"
+	"math"
 	"os"
 
 	"github.com/gdamore/tcell"
@@ -129,7 +130,13 @@ func (e *EditArea) Draw(a area.Area) {
 
 	styledRunes := syntax.Highlight(e.Filename, e.text.String())
 
-	for y := a.Start.Y; y < a.End.Y; y++ {
+	yMin := math.MaxInt32
+	for _, i := range []int{a.End.Y, e.text.Length()} {
+		if i < yMin {
+			yMin = i
+		}
+	}
+	for y := a.Start.Y; y < yMin; y++ {
 		for x, sr := range styledRunes[y+e.lineno] {
 			switch sr.Rune {
 			case '\t':
@@ -143,6 +150,7 @@ func (e *EditArea) Draw(a area.Area) {
 			}
 		}
 	}
+
 	e.displayCursor()
 }
 
