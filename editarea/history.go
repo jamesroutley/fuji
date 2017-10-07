@@ -1,13 +1,16 @@
 package editarea
 
-import "github.com/jamesroutley/fuji/text"
+import (
+	"github.com/jamesroutley/fuji/area"
+	"github.com/jamesroutley/fuji/text"
+)
 
 // state stores the text and cursor position at a particular time
 type state struct {
-	text       *text.Text
-	curX, curY int
-	next       *state
-	prev       *state
+	text   *text.Text
+	cursor area.Point
+	next   *state
+	prev   *state
 }
 
 // history implements an EditArea's undo and redo functionality.
@@ -19,28 +22,26 @@ type history struct {
 }
 
 // newHistory instantiates a new history object
-func newHistory(t *text.Text, curX, curY, maxLen int) *history {
+func newHistory(t *text.Text, cursor area.Point, maxLen int) *history {
 	s := &state{
-		text: t,
-		curX: curX,
-		curY: curY,
-		next: nil,
-		prev: nil,
+		text:   t,
+		cursor: cursor,
+		next:   nil,
+		prev:   nil,
 	}
 	return &history{head: s, tail: s, len: 0, maxLen: maxLen}
 }
 
 // add adds a state to the history
-func (h *history) add(t *text.Text, curX, curY int) {
+func (h *history) add(t *text.Text, cursor area.Point) {
 	if h.len > h.maxLen {
 		h.forget()
 	}
 	s := &state{
-		text: t,
-		curX: curX,
-		curY: curY,
-		next: nil,
-		prev: h.head,
+		text:   t,
+		cursor: cursor,
+		next:   nil,
+		prev:   h.head,
 	}
 	h.head.next = s
 	h.head = s

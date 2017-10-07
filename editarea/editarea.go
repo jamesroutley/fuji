@@ -40,7 +40,7 @@ type EditArea struct {
 	Mode       Mode
 	history    *history
 	text       *text.Text
-	curX, curY int
+	cursor     area.Point
 	beenEdited bool
 	beenSaved  bool
 	screen     tcell.Screen
@@ -54,10 +54,9 @@ func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
 	return &EditArea{
 		Filename:   filename,
 		Mode:       ModeNormal,
-		history:    newHistory(t, 0, 0, 50),
+		history:    newHistory(t, area.Point{X: 0, Y: 0}, 50),
 		text:       t,
-		curX:       0,
-		curY:       0,
+		cursor:     area.Point{X: 0, Y: 0},
 		beenEdited: false,
 		beenSaved:  true,
 		screen:     screen,
@@ -117,7 +116,7 @@ func AddInsertModeCommand(key tcell.Key, behaviour InsertModeCommand) {
 func (e *EditArea) Draw(a area.Area) {
 	e.displayLen = a.End.Y - a.Start.Y
 	if e.beenEdited {
-		e.history.add(e.text, e.curX, e.curY)
+		e.history.add(e.text, e.cursor)
 		e.beenEdited = false
 	}
 
@@ -155,8 +154,8 @@ func (e *EditArea) Draw(a area.Area) {
 }
 
 func (e *EditArea) displayCursor() {
-	x := e.curX
-	lineLength := e.text.LineLength(e.curY)
+	x := e.cursor.X
+	lineLength := e.text.LineLength(e.cursor.Y)
 	if x >= lineLength-1 {
 		x = lineLength - 1
 	}
@@ -164,86 +163,86 @@ func (e *EditArea) displayCursor() {
 	if x < 0 {
 		x = 0
 	}
-	e.screen.ShowCursor(x, e.curY)
+	e.screen.ShowCursor(x, e.cursor.Y)
 }
 
 // CursorUp moves the cursor up
 func (e *EditArea) CursorUp() {
-	if e.curY+e.lineno == 0 {
+	if e.cursor.Y+e.lineno == 0 {
 		return
 	}
-	e.curY--
-	if e.curY < 10 && e.lineno > 0 {
+	e.cursor.Y--
+	if e.cursor.Y < 10 && e.lineno > 0 {
 		e.lineno--
 	}
 }
 
 // CursorDown moves the cursor down
 func (e *EditArea) CursorDown() {
-	if e.curY+e.lineno >= e.text.Length()-1 {
+	if e.cursor.Y+e.lineno >= e.text.Length()-1 {
 		return
 	}
-	e.curY++
-	if e.displayLen-e.curY < 10 && e.lineno+e.displayLen < e.text.Length() {
+	e.cursor.Y++
+	if e.displayLen-e.cursor.Y < 10 && e.lineno+e.displayLen < e.text.Length() {
 		e.lineno++
 	}
 }
 
 // CursorLeft moves the cursor left
 func (e *EditArea) CursorLeft() {
-	if e.curX > e.text.LineLength(e.curY)-1 {
-		e.curX = e.text.LineLength(e.curY) - 1
+	if e.cursor.X > e.text.LineLength(e.cursor.Y)-1 {
+		e.cursor.X = e.text.LineLength(e.cursor.Y) - 1
 	}
-	if e.curX <= 0 && e.curY <= 0 {
+	if e.cursor.X <= 0 && e.cursor.Y <= 0 {
 		return
 	}
-	if e.curX <= 0 {
-		e.curY--
-		e.curX = e.text.LineLength(e.curY) - 1
+	if e.cursor.X <= 0 {
+		e.cursor.Y--
+		e.cursor.X = e.text.LineLength(e.cursor.Y) - 1
 		return
 	}
-	e.curX--
+	e.cursor.X--
 }
 
 // CursorRight moves the cursor right
 func (e *EditArea) CursorRight() {
 	// Don'e move cursor past end of document
-	if e.curX >= e.text.LineLength(e.curY)-1 && e.curY >= e.text.Length()-1 {
+	if e.cursor.X >= e.text.LineLength(e.cursor.Y)-1 && e.cursor.Y >= e.text.Length()-1 {
 		return
 	}
 	// If at the end of a line, move cursor to beginning of next
-	if e.curX >= e.text.LineLength(e.curY)-1 {
-		e.curY++
-		e.curX = 0
+	if e.cursor.X >= e.text.LineLength(e.cursor.Y)-1 {
+		e.cursor.Y++
+		e.cursor.X = 0
 		return
 	}
-	e.curX++
+	e.cursor.X++
 }
 
 // CursorAtLineStart returns whether the cursor is at the beginning of a line
 func (e *EditArea) CursorAtLineStart() bool {
-	return e.curX == 0
+	return e.cursor.X == 0
 }
 
 // CursorAtLineEnd returns whether the cursor is at the end of a line
 func (e *EditArea) CursorAtLineEnd() bool {
-	return e.curX == e.text.LineLength(e.curY)-1
+	return e.cursor.X == e.text.LineLength(e.cursor.Y)-1
 }
 
 // CursorAtTextStart returns whether the cursor is at the beginning of the text
 func (e *EditArea) CursorAtTextStart() bool {
-	return e.curY == 0
+	return e.cursor.Y == 0
 }
 
 // CursorAtTextEnd returns whether the cursor is at the end of the text
 func (e *EditArea) CursorAtTextEnd() bool {
-	return e.curY == e.text.Length()-1
+	return e.cursor.Y == e.text.Length()-1
 }
 
 // Insert inserts rune r at the cursor position
 func (e *EditArea) Insert(r rune) {
 	e.beenEdited = true
-	e.text = e.text.Insert(e.curY, e.curX, r)
+	e.text = e.text.Insert(e.cursor.Y, e.cursor.X, r)
 	e.CursorRight()
 	e.beenSaved = false
 }
@@ -251,16 +250,16 @@ func (e *EditArea) Insert(r rune) {
 // Delete deletes the rune under the cursor
 func (e *EditArea) Delete() {
 	e.beenEdited = true
-	e.text = e.text.Delete(e.curY, e.curX)
+	e.text = e.text.Delete(e.cursor.Y, e.cursor.X)
 	e.beenSaved = false
 }
 
 // LineBreak inserts a line break at the cursor position
 func (e *EditArea) LineBreak() {
 	e.beenEdited = true
-	e.text = e.text.SplitLine(e.curY, e.curX)
+	e.text = e.text.SplitLine(e.cursor.Y, e.cursor.X)
 	e.CursorDown()
-	for e.curX > 0 {
+	for e.cursor.X > 0 {
 		e.CursorLeft()
 	}
 	e.beenSaved = false
@@ -269,15 +268,15 @@ func (e *EditArea) LineBreak() {
 // Backspace handles the backspace event
 func (e *EditArea) Backspace() {
 	e.beenEdited = true
-	if e.curX == 0 && e.curY == 0 {
+	if e.cursor.X == 0 && e.cursor.Y == 0 {
 		return
 	}
-	if e.curX == 0 {
-		lineAboveLen := e.text.LineLength(e.curY - 1)
-		e.text = e.text.AppendLine(e.curY-1, e.text.Line(e.curY))
-		e.text = e.text.DeleteLine(e.curY)
+	if e.cursor.X == 0 {
+		lineAboveLen := e.text.LineLength(e.cursor.Y - 1)
+		e.text = e.text.AppendLine(e.cursor.Y-1, e.text.Line(e.cursor.Y))
+		e.text = e.text.DeleteLine(e.cursor.Y)
 		e.CursorUp()
-		e.curX = lineAboveLen
+		e.cursor.X = lineAboveLen
 		return
 	}
 	e.CursorLeft()
@@ -287,7 +286,7 @@ func (e *EditArea) Backspace() {
 
 // Peek returns the rune under the cursor
 func (e *EditArea) Peek() (r rune) {
-	r, _, _, _ = e.screen.GetContent(e.curX, e.curY)
+	r, _, _, _ = e.screen.GetContent(e.cursor.X, e.cursor.Y)
 	return
 }
 
@@ -295,16 +294,16 @@ func (e *EditArea) Peek() (r rune) {
 func (e *EditArea) Undo() {
 	e.history.undo()
 	e.text = e.history.head.text
-	e.curX = e.history.head.curX
-	e.curY = e.history.head.curY
+	e.cursor.X = e.history.head.cursor.X
+	e.cursor.Y = e.history.head.cursor.Y
 }
 
 // Redo undoes the last undo
 func (e *EditArea) Redo() {
 	e.history.redo()
 	e.text = e.history.head.text
-	e.curX = e.history.head.curX
-	e.curY = e.history.head.curY
+	e.cursor.X = e.history.head.cursor.X
+	e.cursor.Y = e.history.head.cursor.Y
 }
 
 // Save saves the file
