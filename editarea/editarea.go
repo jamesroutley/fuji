@@ -176,6 +176,9 @@ func (e *EditArea) displayCursor() {
 // cursor can be one square further to the right, like in vim.
 func (e *EditArea) cursorMaxX() (x int) {
 	x = e.text.LineLength(e.cursor.Y)
+	if x == 0 {
+		return
+	}
 	if e.Mode == ModeNormal {
 		x--
 	}
@@ -187,21 +190,26 @@ func (e *EditArea) CursorUp() {
 	if e.cursor.Y+e.lineno == 0 {
 		return
 	}
-	e.cursor.Y--
 	if e.cursor.Y < 10 && e.lineno > 0 {
 		e.lineno--
+		return
 	}
+	e.cursor.Y--
 }
 
 // CursorDown moves the cursor down
 func (e *EditArea) CursorDown() {
-	if e.cursor.Y+e.lineno >= e.cursorMaxX() {
+	// Return early if the cursor is at the end of the document
+	if e.cursor.Y+e.lineno >= e.text.Length()-1 {
+		return
+	}
+	// If the cursor is under 10 lines from the end of the displayed document
+	// and there is room to scroll
+	if e.displayLen-e.cursor.Y < 10 && e.lineno+e.displayLen < e.text.Length() {
+		e.lineno++
 		return
 	}
 	e.cursor.Y++
-	if e.displayLen-e.cursor.Y < 10 && e.lineno+e.displayLen < e.text.Length() {
-		e.lineno++
-	}
 }
 
 // CursorLeft moves the cursor left
