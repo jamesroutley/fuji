@@ -32,12 +32,15 @@ func Insert(e *editarea.EditArea) { e.Mode = editarea.ModeInsert }
 
 // Append moves the cursor right and switches the EditArea into insert mode
 func Append(e *editarea.EditArea) {
-	e.CursorRight()
 	e.Mode = editarea.ModeInsert
+	e.CursorRight()
 }
 
 // NormalMode switches the EditArea into normal mode
-func NormalMode(e *editarea.EditArea) { e.Mode = editarea.ModeNormal }
+func NormalMode(e *editarea.EditArea) {
+	e.CursorLeft()
+	e.Mode = editarea.ModeNormal
+}
 
 // Backspace deletes the previous rune
 func Backspace(e *editarea.EditArea) {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
+	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
@@ -155,15 +156,30 @@ func (e *EditArea) Draw(a area.Area) {
 
 func (e *EditArea) displayCursor() {
 	x := e.cursor.X
-	lineLength := e.text.LineLength(e.cursor.Y)
-	if x >= lineLength-1 {
-		x = lineLength - 1
+	maxX := e.cursorMaxX()
+
+	// If the cursor x is greater than the number of characters on that line,
+	// display the cursor at the end of the line
+	if x >= maxX {
+		x = maxX
 	}
 	// TODO: pretty hacky!
 	if x < 0 {
 		x = 0
 	}
+	logger.L.Print(e.cursor.X, e.cursor.Y)
 	e.screen.ShowCursor(x, e.cursor.Y)
+}
+
+// cursorMaxX returns the maximum x that the cursor can be at for the current
+// line. This x value depends on the mode of the editor. In insert mode, the
+// cursor can be one square further to the right, like in vim.
+func (e *EditArea) cursorMaxX() (x int) {
+	x = e.text.LineLength(e.cursor.Y)
+	if e.Mode == ModeNormal {
+		x--
+	}
+	return
 }
 
 // CursorUp moves the cursor up
@@ -179,7 +195,7 @@ func (e *EditArea) CursorUp() {
 
 // CursorDown moves the cursor down
 func (e *EditArea) CursorDown() {
-	if e.cursor.Y+e.lineno >= e.text.Length()-1 {
+	if e.cursor.Y+e.lineno >= e.cursorMaxX() {
 		return
 	}
 	e.cursor.Y++
@@ -190,15 +206,20 @@ func (e *EditArea) CursorDown() {
 
 // CursorLeft moves the cursor left
 func (e *EditArea) CursorLeft() {
-	if e.cursor.X > e.text.LineLength(e.cursor.Y)-1 {
-		e.cursor.X = e.text.LineLength(e.cursor.Y) - 1
+	// If the cursor x is greater than the maximum x for that line, decrement
+	// x until the cursor is at the end of the line.
+	xMax := e.cursorMaxX()
+	if e.cursor.X > xMax {
+		e.cursor.X = xMax
 	}
+	// Don't do anything if the cursor is at (0, 0)
 	if e.cursor.X <= 0 && e.cursor.Y <= 0 {
 		return
 	}
+	// If the x == 0, move the cursor to the end of the line above
 	if e.cursor.X <= 0 {
 		e.cursor.Y--
-		e.cursor.X = e.text.LineLength(e.cursor.Y) - 1
+		e.cursor.X = e.cursorMaxX()
 		return
 	}
 	e.cursor.X--
@@ -210,8 +231,9 @@ func (e *EditArea) CursorRight() {
 	if e.cursor.X >= e.text.LineLength(e.cursor.Y)-1 && e.cursor.Y >= e.text.Length()-1 {
 		return
 	}
+
 	// If at the end of a line, move cursor to beginning of next
-	if e.cursor.X >= e.text.LineLength(e.cursor.Y)-1 {
+	if e.cursor.X >= e.cursorMaxX() {
 		e.cursor.Y++
 		e.cursor.X = 0
 		return
