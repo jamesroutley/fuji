@@ -88,6 +88,49 @@ func JmpToWordEnd(e *editarea.EditArea) {
 	e.CursorRight()
 }
 
+// atEmptyLine returns a bool indicating whether the line that the cursor is at
+// is empty.
+func atEmptyLine(e *editarea.EditArea) bool {
+	return e.CursorAtLineStart() && e.CursorAtLineEnd()
+}
+
+// JmpToParagraphEnd moves the cursor to the next empty line
+func JmpToParagraphEnd(e *editarea.EditArea) {
+	// If we are already on an empty line, skip to the next non-empty line
+	for atEmptyLine(e) {
+		if e.CursorAtTextEnd() {
+			return
+		}
+		e.CursorDown()
+	}
+
+	for !atEmptyLine(e) {
+		if e.CursorAtTextEnd() {
+			return
+		}
+		e.CursorDown()
+	}
+}
+
+// JmpToParagraphStart moves the cursor to the previous empty line
+func JmpToParagraphStart(e *editarea.EditArea) {
+	// If we are already on an empty line, skip to the next non-empty line
+	for atEmptyLine(e) {
+		if e.CursorAtTextStart() {
+			return
+		}
+		e.CursorUp()
+	}
+
+	for !atEmptyLine(e) {
+		if e.CursorAtTextStart() {
+			return
+		}
+		e.CursorUp()
+	}
+
+}
+
 // Save saves the file being edited
 func Save(e *editarea.EditArea) { e.Save() }
 

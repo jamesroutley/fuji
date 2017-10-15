@@ -256,7 +256,7 @@ func (e *EditArea) CursorAtLineStart() bool {
 
 // CursorAtLineEnd returns whether the cursor is at the end of a line
 func (e *EditArea) CursorAtLineEnd() bool {
-	return e.cursor.X == e.text.LineLength(e.cursor.Y)-1
+	return e.cursor.X == e.cursorMaxX()
 }
 
 // CursorAtTextStart returns whether the cursor is at the beginning of the text

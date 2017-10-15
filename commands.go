@@ -22,6 +22,8 @@ func registerNormalModeCommands() {
 	editarea.AddNormalModeCommand("$", commands.JmpToLineEnd)
 	editarea.AddNormalModeCommand("b", commands.JmpToWordStart)
 	editarea.AddNormalModeCommand("w", commands.JmpToWordEnd)
+	editarea.AddNormalModeCommand("{", commands.JmpToParagraphStart)
+	editarea.AddNormalModeCommand("}", commands.JmpToParagraphEnd)
 }
 
 func registerInsertModeCommands() {
