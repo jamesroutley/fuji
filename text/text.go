@@ -31,6 +31,11 @@ func New(r io.Reader) *Text {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
+	// If the input string is empty, add an empty gapbuffer at index 0
+	if len(buf) == 0 {
+		buf = append(buf, line.New(""))
+		lineCount++
+	}
 	buf = append(buf, make([]*line.Line, defaultGapSize)...)
 	size := lineCount + defaultGapSize
 	return &Text{
@@ -47,6 +52,9 @@ func (t Text) Line(row int) *line.Line {
 }
 
 func (t Text) realIndex(i int) (index int) {
+	if i >= t.Length() {
+		panic("Text index out of range")
+	}
 	index = i
 	if i >= t.start {
 		gapSize := t.end - t.start

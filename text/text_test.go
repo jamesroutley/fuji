@@ -24,6 +24,12 @@ world`
 	assert.Equal(t, 2+defaultGapSize, text.end)
 }
 
+func TestNewWithEmptyReader(t *testing.T) {
+	t.Parallel()
+	text := newTextFromString("")
+	assert.Equal(t, "", text.String())
+}
+
 func TestRealIndex(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
@@ -32,7 +38,9 @@ func TestRealIndex(t *testing.T) {
 		i      int
 		realI  int
 	}{
+		{"hello\nworld", 0, 0, defaultGapSize},
 		{"hello\nworld", 0, 1, defaultGapSize + 1},
+		{"hello\nworld", 1, 0, 0},
 		{"hello\nworld", 1, 1, defaultGapSize + 1},
 	}
 	for _, tc := range testCases {
@@ -121,7 +129,9 @@ func TestLength(t *testing.T) {
 	}{
 		{"hello\nworld", 2},
 		{"1 \n2 \n3 \n4 \n5", 5},
-		{"", 0},
+		// Counterintuitive, but we add an empty gapbuffer at the 0th index
+		// of the Text, giving it a length of 1
+		{"", 1},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.source, func(t *testing.T) {

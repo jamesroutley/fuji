@@ -7,7 +7,6 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
-	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
@@ -167,7 +166,6 @@ func (e *EditArea) displayCursor() {
 	if x < 0 {
 		x = 0
 	}
-	logger.L.Print(e.cursor.X, e.cursor.Y)
 	e.screen.ShowCursor(x, e.cursor.Y)
 }
 
