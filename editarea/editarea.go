@@ -7,6 +7,7 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/jamesroutley/fuji/area"
+	"github.com/jamesroutley/fuji/logger"
 	"github.com/jamesroutley/fuji/syntax"
 	"github.com/jamesroutley/fuji/text"
 )
@@ -49,7 +50,7 @@ type EditArea struct {
 }
 
 // New returns a new EditArea
-func New(screen tcell.Screen, filename string, r io.ReadWriter) *EditArea {
+func New(screen tcell.Screen, filename string, r io.Reader) *EditArea {
 	t := text.New(r)
 	return &EditArea{
 		Filename:   filename,
@@ -159,13 +160,15 @@ func (e *EditArea) displayCursor() {
 
 	// If the cursor x is greater than the number of characters on that line,
 	// display the cursor at the end of the line
-	if x >= maxX {
+	if x > maxX {
 		x = maxX
 	}
 	// TODO: pretty hacky!
-	if x < 0 {
-		x = 0
-	}
+	// if x < 0 {
+	// 	x = 0
+	// }
+	logger.L.Print("cursorMaxX: ", maxX)
+	logger.L.Print("cursor: ", e.cursor.X, e.cursor.Y)
 	e.screen.ShowCursor(x, e.cursor.Y)
 }
 
